@@ -81,10 +81,10 @@ export default function Applications() {
   return (
     <div className="min-h-screen bg-background">
       <AppNavbar />
-      <Header 
+      {/* <Header 
         title="My Applications" 
         description="Track the status of your job applications"
-      />
+      /> */}
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {applications.length === 0 ? (

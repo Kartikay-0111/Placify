@@ -1,4 +1,3 @@
-
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader } from "lucide-react";
@@ -29,19 +28,13 @@ export default function ProtectedRoute({ allowedRoles }) {
 
   // If user role is not allowed, redirect to appropriate dashboard
   if (!allowedRoles.includes(user.role)) {
-    console.log("User role not allowed, redirecting to appropriate dashboard");
-    let redirectPath;
-    switch (user.role) {
-      case 'admin':
-        redirectPath = '/admin';
-        break;
-      case 'company':
-        redirectPath = '/company/dashboard';
-        break;
-      case 'student':
-      default:
-        redirectPath = '/dashboard';
-    }
+    console.log(`User role (${user.role}) not allowed, redirecting to appropriate dashboard`);
+    const roleRedirectPaths = {
+      admin: '/admin',
+      company: '/company/dashboard',
+      student: '/dashboard',
+    };
+    const redirectPath = roleRedirectPaths[user.role] || '/';
     return <Navigate to={redirectPath} replace />;
   }
 

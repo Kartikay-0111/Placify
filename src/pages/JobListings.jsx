@@ -42,7 +42,7 @@ export default function JobListings() {
       job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesJobType = !filters.jobType || job.job_type === filters.jobType;
+    const matchesJobType = !filters.jobType || job.job_type.toLowerCase().trim() === filters.jobType.toLowerCase().trim();
     const matchesLocation = !filters.location || job.location.toLowerCase().includes(filters.location.toLowerCase());
     const matchesCgpa = !filters.minCgpa || job.min_cgpa <= parseFloat(filters.minCgpa);
 
@@ -63,10 +63,10 @@ export default function JobListings() {
   return (
     <div className="min-h-screen bg-background">
       <AppNavbar />
-      <Header 
+      {/* <Header 
         title="Job Listings" 
         description="Explore available job opportunities"
-      />
+      /> */}
       
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="mb-6 space-y-4">
@@ -87,9 +87,9 @@ export default function JobListings() {
               className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option value="">All Job Types</option>
-              <option value="full-time">Full Time</option>
+              <option value="full-time">Full-time</option>
               <option value="internship">Internship</option>
-              <option value="part-time">Part Time</option>
+              <option value="part-time">Part-time</option>
             </select>
 
             <input

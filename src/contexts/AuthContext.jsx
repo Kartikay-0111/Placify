@@ -68,7 +68,8 @@ export const AuthProvider = ({ children }) => {
 
       if (error) throw error;
 
-      const userRole = data.user.user_metadata?.role || 'student';
+      const userRole = data.user.user_metadata?.role || 'company';
+      console.log(data.user);
       setUser({
         id: data.user.id,
         email: data.user.email,

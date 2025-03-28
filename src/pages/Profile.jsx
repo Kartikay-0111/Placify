@@ -73,7 +73,7 @@ export default function Profile() {
     <div className="min-h-screen flex flex-col bg-gray-100">
       <AppNavbar />
 
-      <main className="flex-1 pt-20 pb-12 px-4 md:px-8 lg:px-12">
+      <main className="flex-1 pt-6 pb-12 px-4 md:px-8 lg:px-12">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-1">Your Profile</h1>
@@ -89,7 +89,7 @@ export default function Profile() {
                 >
                   <User className="h-4 w-4" />
                   <span>Profile Information</span>
-                </button>
+                </button> 
                 <button
                   className={`flex items-center gap-2 px-4 py-3 rounded-t-lg ${activeTab === 'resume' ? 'bg-gray-100 font-medium' : 'text-gray-500'}`}
                   onClick={() => setActiveTab('resume')}
