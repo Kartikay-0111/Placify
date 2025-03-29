@@ -12,25 +12,26 @@ export default function CompanyProfile() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [isNewProfile, setIsNewProfile] = useState(false);
-
+  // console.log('User:', user);
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
-
+    
       try {
         setLoading(true);
         const { data, error } = await supabase
           .from('company_profiles')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching company profile:', error.message);
           alert('Failed to load company profile');
         }
 
-        setProfile(data || null);
+        setProfile(data);
+        // console.log('Profile:', data);
         setIsNewProfile(!data);
       } catch (error) {
         console.error('Error in fetchProfile:', error.message);
@@ -61,25 +62,28 @@ export default function CompanyProfile() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8f9fa' }}>
+    <div className="min-h-screen flex flex-col bg-base-200">
       <AppNavbar />
-      <main style={{ flex: 1, padding: '20px', maxWidth: '800px', margin: 'auto' }}>
-        <Header title="Company Profile" subtitle={isNewProfile ? "Complete your company profile to start posting jobs" : "Manage your company information"} />
-        <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <h2>{isNewProfile ? "Create Company Profile" : "Edit Company Profile"}</h2>
-          <p>{isNewProfile ? "Provide details about your company to attract the right talent" : "Update your company information"}</p>
-          {!isNewProfile && (
-            <button onClick={() => navigate('/company/jobs/new')} style={{ margin: '10px 0', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              Post a Job
-            </button>
-          )}
+      <main className="flex-1 p-5 max-w-3xl mx-auto">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-2xl font-bold mb-2">
+            {isNewProfile ? "Create Company Profile" : "Edit Company Profile"}
+          </h2>
+          <p className="text-gray-600 mb-4">
+            {isNewProfile
+              ? "Provide details about your company to attract the right talent"
+              : "Update your company information"}
+          </p>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '20px' }}>
-              <div style={{ width: '40px', height: '40px', border: '4px solid #007bff', borderTop: '4px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-              <p>Loading profile...</p>
+            <div className="text-center py-5">
+              <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <p className="mt-2">Loading profile...</p>
             </div>
           ) : (
-            <CompanyProfileForm initialData={profile} onSuccess={handleProfileSuccess} />
+            <CompanyProfileForm
+              initialData={profile}
+              onSuccess={handleProfileSuccess}
+            />
           )}
         </div>
       </main>

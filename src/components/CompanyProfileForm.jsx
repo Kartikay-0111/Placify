@@ -37,9 +37,9 @@ export default function CompanyProfileForm({ initialData, onSuccess }) {
     const fileExt = logoFile.name.split('.').pop();
     const filePath = `${userId}-${Date.now()}.${fileExt}`;
     try {
-      const { data, error } = await supabase.storage.from('company_logos').upload(filePath, logoFile, { upsert: true });
+      const { data, error } = await supabase.storage.from('company-logos').upload(filePath, logoFile, { upsert: true });
       if (error) throw error;
-      return supabase.storage.from('company_logos').getPublicUrl(filePath).data.publicUrl;
+      return supabase.storage.from('company-logos').getPublicUrl(filePath).data.publicUrl;
     } catch (error) {
       alert("Error uploading logo: " + error.message);
       return null;
@@ -69,12 +69,12 @@ export default function CompanyProfileForm({ initialData, onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit(saveProfile)} className="space-y-6">
-      <div className="space-y-4">
+      <div>
         <label className="block">Company Name</label>
         <input className="border p-2 w-full" {...register('company_name', { required: "Company name is required" })} />
         {errors.company_name && <p className="text-red-500 text-sm">{errors.company_name.message}</p>}
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block">Industry</label>
@@ -87,24 +87,24 @@ export default function CompanyProfileForm({ initialData, onSuccess }) {
           {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
         </div>
       </div>
-      
+
       <div>
         <label className="block">Website</label>
         <input className="border p-2 w-full" {...register('website')} />
       </div>
-      
+
       <div>
         <label className="block">Company Description</label>
         <textarea className="border p-2 w-full h-24" {...register('description', { required: "Description is required" })}></textarea>
         {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
       </div>
-      
+
       <div>
         <label className="block">Company Logo</label>
         {logoPreview && <img src={logoPreview} alt="Logo preview" className="w-24 h-24 border rounded" />}
         <input type="file" accept="image/*" onChange={handleLogoChange} className="block mt-2" />
       </div>
-      
+
       <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded" disabled={loading}>
         {loading ? 'Saving...' : 'Save Company Profile'}
       </button>

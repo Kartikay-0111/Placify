@@ -1,86 +1,343 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { supabase } from '@/lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '../lib/supabase';
+import { X, Plus, Calendar, Info } from 'lucide-react';
 
-export default function JobPostingForm({ initialData, onSuccess }) {
+const JobPostingForm = ({ initialFormData = null }) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [requirement, setRequirement] = useState('');
-  const [requirements, setRequirements] = useState(initialData?.requirements || []);
+  const [error, setError] = useState(null);
+  const [requirements, setRequirements] = useState([]);
+  const [newRequirement, setNewRequirement] = useState('');
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: initialData || {
-      title: '', position: '', company_name: '', location: '', job_type: 'Full-time',
-      description: '', stipend: '', min_cgpa: 7.0, application_deadline: '', status: 'Draft',
-      eligibility_criteria: ''
-    }
+  const [formData, setFormData] = useState({
+    title: '',
+    company_name: '',
+    position: '',
+    location: '',
+    job_type: 'Full-time',
+    description: '',
+    min_cgpa: 0,
+    stipend: '',
+    eligibility_criteria: '',
+    application_deadline: '',
+    status: 'pending',
   });
 
+  useEffect(() => {
+    if (initialFormData) {
+      setFormData(initialFormData);
+      setRequirements(initialFormData.requirements || []);
+    }
+  }, [initialFormData]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const addRequirement = () => {
-    if (requirement.trim() === '') return;
-    setRequirements([...requirements, requirement.trim()]);
-    setRequirement('');
+    if (newRequirement.trim() !== '') {
+      setRequirements([...requirements, newRequirement.trim()]);
+      setNewRequirement('');
+    }
   };
 
   const removeRequirement = (index) => {
     setRequirements(requirements.filter((_, i) => i !== index));
   };
 
-  const saveJob = async (formData) => {
-    if (!user) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
+    setError(null);
+
     try {
-      const jobData = { ...formData, requirements, company_id: user.id, updated_at: new Date().toISOString() };
-      let result = initialData?.id 
-        ? await supabase.from('jobs').update(jobData).eq('id', initialData.id) 
-        : await supabase.from('jobs').insert({ ...jobData, created_at: new Date().toISOString() });
-      if (result.error) throw result.error;
-      onSuccess();
-    } catch (error) {
-      console.error('Error saving job:', error);
+      const jobData = {
+        ...formData,
+        requirements,
+        company_id: user?.id,
+        updated_at: new Date(),
+      };
+
+      if (initialFormData) {
+        // Update job
+        const { error } = await supabase
+          .from('jobs')
+          .update(jobData)
+          .eq('id', initialFormData.id);
+
+        if (error) throw error;
+      } else {
+        // Create new job
+        jobData.created_at = new Date();
+        const { error } = await supabase.from('jobs').insert([jobData]);
+
+        if (error) throw error;
+      }
+
+      navigate('/jobs');
+    } catch (err) {
+      console.error('Error saving job:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(saveJob)} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label>Job Title</label>
-          <input type="text" {...register('title', { required: 'Job title is required' })} className="border p-2 w-full" />
-          {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
-        </div>
-        <div>
-          <label>Company Name</label>
-          <input type="text" {...register('company_name', { required: 'Company name is required' })} className="border p-2 w-full" />
-          {errors.company_name && <p className="text-red-500 text-sm">{errors.company_name.message}</p>}
+    <div className="container mx-auto px-4 py-8">
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body">
+          {error && (
+            <div className="alert alert-error mb-6">
+              <Info size={16} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Job Title */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Job Title</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Software Engineer Intern"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              {/* Company Name */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Company Name</span>
+                </label>
+                <input
+                  type="text"
+                  name="company_name"
+                  value={formData.company_name}
+                  onChange={handleInputChange}
+                  placeholder="Your company name"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              {/* Position */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Position</span>
+                </label>
+                <input
+                  type="text"
+                  name="position"
+                  value={formData.position}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Junior Developer"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              {/* Location */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Location</span>
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Remote, Bangalore, etc."
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              {/* Job Type */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Job Type</span>
+                </label>
+                <select
+                  name="job_type"
+                  value={formData.job_type}
+                  onChange={handleInputChange}
+                  className="select select-bordered w-full"
+                  required
+                >
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Internship">Internship</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Freelance">Freelance</option>
+                </select>
+              </div>
+
+              {/* Min CGPA */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Minimum CGPA Required</span>
+                </label>
+                <input
+                  type="number"
+                  name="min_cgpa"
+                  value={formData.min_cgpa}
+                  onChange={handleInputChange}
+                  placeholder="e.g. 7.5"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              {/* Stipend */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Stipend/Salary</span>
+                </label>
+                <input
+                  type="text"
+                  name="stipend"
+                  value={formData.stipend}
+                  onChange={handleInputChange}
+                  placeholder="e.g. ₹20,000/month"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+
+              {/* Application Deadline */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Application Deadline</span>
+                </label>
+                <div className="input-group">
+                  <input
+                    type="datetime-local"
+                    name="application_deadline"
+                    value={formData.application_deadline}
+                    onChange={handleInputChange}
+                    className="input input-bordered w-full"
+                    required
+                  />
+                  <span className="btn btn-square">
+                    <Calendar size={18} />
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="form-control mt-6">
+              <label className="label">
+                <span className="label-text">Job Description</span>
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Detailed description of the job role and responsibilities"
+                className="textarea textarea-bordered h-32"
+                required
+              ></textarea>
+            </div>
+
+            {/* Requirements */}
+            <div className="form-control mt-6">
+              <label className="label">
+                <span className="label-text">Requirements</span>
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {requirements.map((req, index) => (
+                  <div key={index} className="badge badge-primary gap-2">
+                    <span>{req}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeRequirement(index)}
+                      className="btn btn-ghost btn-xs p-0"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="input-group">
+                <input
+                  type="text"
+                  value={newRequirement}
+                  onChange={(e) => setNewRequirement(e.target.value)}
+                  placeholder="Add a requirement (e.g. JavaScript, 3 years experience, etc.)"
+                  className="input input-bordered w-full"
+                />
+                <button
+                  type="button"
+                  onClick={addRequirement}
+                  className="btn btn-square"
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Eligibility Criteria */}
+            <div className="form-control mt-6">
+              <label className="label">
+                <span className="label-text">Eligibility Criteria</span>
+              </label>
+              <textarea
+                name="eligibility_criteria"
+                value={formData.eligibility_criteria}
+                onChange={handleInputChange}
+                placeholder="Specific eligibility criteria for applying to this position"
+                className="textarea textarea-bordered h-20"
+                required
+              ></textarea>
+            </div>
+
+            {/* Form Actions */}
+            <div className="card-actions justify-end mt-8">
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => navigate('/jobs')}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? (
+                  <span className="loading loading-spinner"></span>
+                ) : initialFormData ? (
+                  'Update Job'
+                ) : (
+                  'Create Job'
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-      
-      <div>
-        <label>Requirements</label>
-        <div className="flex gap-2 flex-wrap">
-          {requirements.map((req, index) => (
-            <span key={index} className="px-3 py-1 bg-gray-200 rounded flex items-center">
-              {req} <button type="button" onClick={() => removeRequirement(index)} className="ml-2 text-red-500">x</button>
-            </span>
-          ))}
-        </div>
-        <div className="flex gap-2 mt-2">
-          <input type="text" value={requirement} onChange={(e) => setRequirement(e.target.value)} 
-            className="border p-2 w-full" placeholder="Add requirement" />
-          <button type="button" onClick={addRequirement} className="bg-blue-500 text-white px-4 py-2">+</button>
-        </div>
-      </div>
-      
-      <div className="flex justify-end space-x-2">
-        <button type="button" onClick={onSuccess} className="border px-4 py-2">Cancel</button>
-        <button type="submit" disabled={loading} className="bg-blue-500 text-white px-4 py-2">
-          {loading ? 'Saving...' : initialData?.id ? 'Update Job' : 'Create Job'}
-        </button>
-      </div>
-    </form>
+    </div>
   );
-}
+};
+
+export default JobPostingForm;

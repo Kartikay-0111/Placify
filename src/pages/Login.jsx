@@ -30,6 +30,7 @@ export default function Login() {
   });
 
   const onSubmit = async (values) => {
+    // console.log('Login form values:', values);
     try {
       setIsSubmitting(true);
       console.log('Login form submitted:', values.email);

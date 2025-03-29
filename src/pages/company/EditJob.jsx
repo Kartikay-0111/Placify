@@ -61,7 +61,7 @@ export default function EditJob() {
     <div className="min-h-screen flex flex-col bg-gray-100">
       <AppNavbar />
       
-      <main className="flex-1 pt-20 pb-12 px-4 md:px-8 lg:px-12">
+      <main className="flex-1 pt-6 pb-12 px-4 md:px-8 lg:px-12">
         <div className="max-w-4xl mx-auto bg-white p-6 shadow-md rounded-lg">
           <h1 className="text-2xl font-bold mb-2">Edit Job</h1>
           <p className="text-gray-600 mb-4">Update your job posting details.</p>
@@ -74,10 +74,8 @@ export default function EditJob() {
               </div>
             </div>
           ) : (
-            <div className="border-t pt-4">
-              <h2 className="text-lg font-semibold mb-1">Job Details</h2>
-              <p className="text-gray-500 mb-4">Edit the details of your job posting.</p>
-              <JobPostingForm initialData={job} onSuccess={handleSuccess} />
+            <div className="border-t">
+              <JobPostingForm initialFormData={job} onSuccess={handleSuccess} />
             </div>
           )}
         </div>

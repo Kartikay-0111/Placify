@@ -20,62 +20,69 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Set up auth state listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            if (session?.user) {
-              const userRole = session.user.user_metadata?.role || 'student';
-              setUser({
-                id: session.user.id,
-                email: session.user.email,
-                role: userRole
-              });
-            } else {
-              setUser(null);
-            }
-            setLoading(false);
-          }
-        );
-
-        // Check for existing session
         const { data: { session } } = await supabase.auth.getSession();
+  
         if (session?.user) {
-          const userRole = session.user.user_metadata?.role || 'student';
+          // Fetch role from database instead of relying on user_metadata
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', session.user.email)
+            .single();
+  
+          if (userError) {
+            console.error('Error fetching user role:', userError);
+          }
+  
+          const userRole = userData?.role || 'student'; // Default to student if not found
+  
           setUser({
             id: session.user.id,
             email: session.user.email,
-            role: userRole
+            role: userRole,
           });
+        } else {
+          setUser(null);
         }
-
         setLoading(false);
-        return () => subscription.unsubscribe();
       } catch (error) {
         console.error('Auth initialization error:', error);
         setLoading(false);
       }
     };
-
+  
     initAuth();
   }, []);
+  
 
   const signIn = async (email, password) => {
+    console.log('Signing in with email:', email);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  
       if (error) throw error;
-
-      const userRole = data.user.user_metadata?.role || 'company';
-      console.log(data.user);
+      console.log('User logged in:', data.user);
+  
+      // Fetch role from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role')
+        .eq('email', email)
+        .single();
+  
+      if (userError) {
+        console.error('Error fetching user role:', userError);
+        return { data: null, error: userError };
+      }
+  
+      const userRole = userData?.role || 'student'; // Default to student if role is missing
+  
       setUser({
         id: data.user.id,
         email: data.user.email,
-        role: userRole
+        role: userRole,
       });
-
+  
       // Navigate based on role
       switch (userRole) {
         case 'admin':
@@ -90,13 +97,14 @@ export const AuthProvider = ({ children }) => {
         default:
           navigate('/');
       }
-
+  
       return { data, error: null };
     } catch (error) {
       console.error('Sign in error:', error);
       return { data: null, error };
     }
   };
+  
 
   const signUp = async (email, password, role = 'student') => {
     try {

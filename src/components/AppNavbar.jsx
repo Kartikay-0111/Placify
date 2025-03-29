@@ -19,7 +19,6 @@ export default function AppNavbar() {
   const getNavLinks = () => {
     const commonLinks = [
       { to: '/', label: 'Home' },
-      { to: '/jobs', label: 'Jobs' },
     ];
 
     if (!user) {
@@ -28,9 +27,15 @@ export default function AppNavbar() {
 
     switch (user.role) {
       case 'student':
-        return [...commonLinks, { to: '/dashboard', label: 'Dashboard' }, { to: '/applications', label: 'Applications' }, { to: '/profile', label: 'Profile' }];
+        return [...commonLinks, { to: '/jobs', label: 'Jobs' }, { to: '/dashboard', label: 'Dashboard' }, { to: '/applications', label: 'Applications' }, { to: '/profile', label: 'Profile' }];
       case 'company':
-        return [...commonLinks, { to: '/company/dashboard', label: 'Dashboard' }];
+        return [
+          ...commonLinks,
+          { to: '/company/dashboard', label: 'Dashboard' },
+          { to: '/company/jobs', label: 'Manage Jobs' },
+          { to: '/company/jobs/new', label: 'Post Job' },
+          { to: '/company/profile', label: 'Profile' }
+        ];
       case 'admin':
         return [...commonLinks, { to: '/admin', label: 'Dashboard' }, { to: '/admin/jobs', label: 'Manage Jobs' }, { to: '/admin/applications', label: 'Manage Applications' }];
       default:
