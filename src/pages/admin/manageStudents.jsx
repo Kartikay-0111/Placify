@@ -134,7 +134,7 @@ const AdminStudentManagement = () => {
     return (
         <div className="min-h-screen bg-base-200">
             <AppNavbar />
-            <div className="container px-4 py-8  w-10/12 mx-auto">
+            <div className="container px-4 py-8  lg:w-10/12 mx-auto">
                 <h1 className="text-3xl font-bold mb-6">Student Management</h1>
 
                 {/* Tabs */}
@@ -142,25 +142,25 @@ const AdminStudentManagement = () => {
                     <div className='card-body'>
                         <div className="tabs tabs-boxed mb-6">
                             <button
-                                className={`tab ${activeTab === 'pending' ? 'tab-active' : ''}`}
+                                className={`tab flex items-center gap-2 ${activeTab === 'pending' ? 'tab-active' : ''}`}
                                 onClick={() => setActiveTab('pending')}
                             >
                                 Pending
-                                <div className="badge badge-secondary ml-2">{pendingStudents.length}</div>
+                                <div className="badge badge-secondary">{pendingStudents.length}</div>
                             </button>
                             <button
-                                className={`tab ${activeTab === 'approved' ? 'tab-active' : ''}`}
+                                className={`tab flex items-center gap-2 ${activeTab === 'approved' ? 'tab-active' : ''}`}
                                 onClick={() => setActiveTab('approved')}
                             >
                                 Approved
-                                <div className="badge badge-primary ml-2">{approvedStudents.length}</div>
+                                <div className="badge badge-primary">{approvedStudents.length}</div>
                             </button>
                             <button
-                                className={`tab ${activeTab === 'rejected' ? 'tab-active' : ''}`}
+                                className={`tab flex items-center gap-2 ${activeTab === 'rejected' ? 'tab-active' : ''}`}
                                 onClick={() => setActiveTab('rejected')}
                             >
                                 Rejected
-                                <div className="badge badge-error ml-2">{rejectedStudents.length}</div>
+                                <div className="badge badge-error">{rejectedStudents.length}</div>
                             </button>
                         </div>
 

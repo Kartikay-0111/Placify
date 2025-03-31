@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route ,Navigate} from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./contexts/AuthContext";
 // Pages
@@ -29,13 +29,18 @@ import ManageApplications from "./pages/company/ManageApplications";
 import InterviewManagement from "./pages/company/InterviewManagement";
 import OfferManagement from "./pages/company/OffersManagement";
 
+const AuthRedirect = ({ children }) => {
+  const { user } = useAuth();
+  return user ? <Navigate to="/" replace /> : children;
+};
+
 const App = () => (
   <BrowserRouter>
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<AuthRedirect><Login /></AuthRedirect>} />
+        <Route path="/register" element={<AuthRedirect><Register /></AuthRedirect>} />
         <Route path="/jobs/:id" element={<JobDetails />} />
 
         {/* Protected Student Routes */}

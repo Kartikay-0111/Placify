@@ -91,7 +91,7 @@ export default function JobDetails() {
   return (
     <div className="container mx-auto">
       <AppNavbar />
-      <div className="card shadow-xl w-8/12 mx-auto mt-10">
+      <div className="card shadow-xl lg:w-8/12 mx-auto mt-10">
         <div className="card-body">
           <h2 className="card-title text-2xl font-bold mb-4">
             {job.position} at {job.company_name}

@@ -5,11 +5,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import JobCard from '@/components/JobCard';
 import AppNavbar from '@/components/AppNavbar';
 import ApplicationStatus from '../../components/ApplicatonStatus';
+import InterviewsList from './Interviews';
 
 export default function StudentDashboard() {
   const { user } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
+  const[interviews, setInterviews] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('jobs');
@@ -45,7 +47,31 @@ export default function StudentDashboard() {
           .limit(5);
         setApplications(applicationsData || []);
 
-        // console.log('applicationsData', applicationsData);
+        const { data :interviews} = await supabase
+            .from('interviews')
+            .select(`
+                id,
+                interview_date,
+                interview_type,
+                location,
+                meeting_link,
+                result,
+                notes,
+                applications (
+                    job_id,
+                    jobs (
+                        title,
+                        company_name,
+                        location,
+                        job_type,
+                        description
+                    )
+                )
+            `)
+            .eq('applications.student_id', user.id);
+        setInterviews(interviews || []);
+        // console.log(interviews);
+      
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -75,11 +101,11 @@ export default function StudentDashboard() {
       <AppNavbar />
       <main className="flex-1 p-4 md:p-8 container mx-auto">
         <h1 className="text-3xl font-bold mb-6">Student Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card bg-base-100 shadow-xl">
+        <div className="grid lg:grid-cols-12 md:grid-cols-1 gap-6">
+          <div className="card bg-base-100 shadow-xl lg:col-span-3 h-max ">
             <div className="card-body">
               <div className="flex flex-col space-x-6 items-center">
-                {/* Profile Picture */}
+                {/* Profile Picture */} 
                 <div className='flex flex-row gap-4'>
                   <div className="avatar">
                     <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
@@ -145,7 +171,7 @@ export default function StudentDashboard() {
               )}
             </div>
           </div>
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 lg:col-span-9">
             <div className="flex border-b mb-4">
               <button
                 className={`px-4 py-2 ${tab === 'jobs' ? 'border-b-2 border-blue-500' : ''}`}
@@ -156,6 +182,11 @@ export default function StudentDashboard() {
                 className={`px-4 py-2 ${tab === 'applications' ? 'border-b-2 border-blue-500' : ''}`}
                 onClick={() => setTab('applications')}>
                 Recent Applications
+              </button>
+              <button
+                className={`px-4 py-2 ${tab === 'interviews' ? 'border-b-2 border-blue-500' : ''}`}
+                onClick={() => setTab('interviews')}>
+                Interviews
               </button>
             </div>
             {tab === 'jobs' && (
@@ -193,6 +224,9 @@ export default function StudentDashboard() {
                   View All Applications
                 </Link>
               </div>
+            )}
+            {tab === 'interviews' && (
+              <InterviewsList interviews={interviews} loading={loading} />
             )}
           </div>
         </div>

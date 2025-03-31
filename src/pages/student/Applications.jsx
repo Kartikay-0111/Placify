@@ -111,7 +111,7 @@ export default function Applications() {
     <div className="min-h-screen bg-base-200">
       <AppNavbar />
 
-      <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 w-10/12 ">
+      <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8 lg:w-10/12 ">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-base-content">My Applications</h1>

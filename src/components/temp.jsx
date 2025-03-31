@@ -1,541 +1,247 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/AuthContext';
-import AppNavbar from '../../components/AppNavbar';
-const InterviewSchedule = () => {
-    const [loading, setLoading] = useState(true);
-    const [interviews, setInterviews] = useState([]);
-    const [pendingApplications, setPendingApplications] = useState([]);
-    const [stats, setStats] = useState({
-        totalApproved: 0,
-        totalInterviews: 0,
-        totalSelected: 0,
-        totalRejected: 0
-    });
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
-    const [processingId, setProcessingId] = useState(null);
-    const companyId = useAuth().user?.id;
-   
-    // Form state
-    const [formData, setFormData] = useState({
-        application_id: '',
-        interview_date: '',
-        interview_time: '',
-        interview_type: 'technical',
-        location: '',
-        meeting_link: '',
-        notes: ''
-    });
+import { Link } from 'react-router-dom';
+import Navbar from '@/components/AppNavbar';
+import {
+  Users,
+  Briefcase,
+  Award,
+  CheckCircle,
+  MessageCircle,
+  MapPin,
+  Mail,
+  Phone
+} from 'lucide-react';
 
-    useEffect(() => {
-        if (companyId) fetchData();
-    }, [companyId]);
+// Dummy Testimonial Data
+const testimonials = [
+  {
+    name: "John Doe",
+    role: "Software Engineer at Google",
+    image: "/api/placeholder/100/100",
+    quote: "The placement cell was instrumental in helping me secure my dream job. Their support and guidance were exceptional."
+  },
+  {
+    name: "Jane Smith",
+    role: "Product Manager at Microsoft",
+    image: "/api/placeholder/100/100",
+    quote: "I'm grateful for the comprehensive support and networking opportunities provided by the placement cell."
+  },
+  {
+    name: "Mike Johnson",
+    role: "Data Scientist at Amazon",
+    image: "/api/placeholder/100/100",
+    quote: "The placement resources and workshops were key to my successful career launch."
+  }
+];
 
-    const fetchData = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+export default function PlacementCellLandingPage() {
+  const [stats, setStats] = useState({ companies: 0, jobs: 0, placements: 0 });
 
-            // Ensure companyId is available
-            if (!companyId) {
-                setLoading(false);
-                return;
-            }
+  useEffect(() => {
+    const targetStats = { companies: 50, jobs: 120, placements: 85 };
+    const duration = 2000;
+    const frameRate = 20;
+    const totalFrames = duration / frameRate;
+    let frame = 0;
 
-            // Get all job IDs for this company
-            const { data: jobIds, error: jobError } = await supabase
-                .from('jobs')
-                .select('id')
-                .eq('company_id', companyId);
+    const timer = setInterval(() => {
+      frame++;
+      const progress = frame / totalFrames;
+      if (frame <= totalFrames) {
+        setStats({
+          companies: Math.floor(targetStats.companies * progress),
+          jobs: Math.floor(targetStats.jobs * progress),
+          placements: Math.floor(targetStats.placements * progress),
+        });
+      } else {
+        clearInterval(timer);
+      }
+    }, frameRate);
 
-            if (jobError) throw jobError;
-            if (!jobIds?.length) {
-                setInterviews([]);
-                setPendingApplications([]);
-                setStats({
-                    totalApproved: 0,
-                    totalInterviews: 0,
-                    totalSelected: 0,
-                    totalRejected: 0
-                });
-                setLoading(false);
-                return;
-            }
+    return () => clearInterval(timer);
+  }, []);
 
-            const jobIdsList = jobIds.map(job => job.id);
-
-            // Fetch interview application IDs separately
-            const { data: interviewApps, error: interviewAppsError } = await supabase
-                .from('interviews')
-                .select('application_id');
-
-            if (interviewAppsError) throw interviewAppsError;
-
-            const interviewApplicationIds = interviewApps?.map(app => app.application_id) || [];
-
-            // Get all approved applications without scheduled interviews
-            const { data: approved, error: approvedError } = await supabase
-                .from('applications')
-                .select(`
-                id, 
-                student_id,
-                status,
-                submitted_at,
-                student_profiles (user_id, full_name),
-                jobs (id, title)
-            `)
-                .in('job_id', jobIdsList)
-                .eq('status', 'company_approved');
-
-            if (approvedError) throw approvedError;
-
-            // Filter out applications that already have interviews
-            const filteredApplications = approved?.filter(app => !interviewApplicationIds.includes(app.id)) || [];
-
-            setPendingApplications(filteredApplications);
-
-            // Get all interviews for this company's applications
-            const { data: interviewsData, error: interviewsError } = await supabase
-                .from('interviews')
-                .select(`
-                id, 
-                interview_date, 
-                interview_type, 
-                location, 
-                meeting_link, 
-                result, 
-                notes,
-                applications (
-                    id, 
-                    student_profiles (user_id, full_name),
-                    jobs (id, title)
-                )
-            `)
-                .in('application_id', approved.map(app => app.id));
-
-            if (interviewsError) throw interviewsError;
-            setInterviews(interviewsData || []);
-            // console.log('Interviews:', interviewsData);
-
-            // Calculate stats
-            const totalApproved = filteredApplications.length + (interviewsData?.length || 0);
-            const totalInterviews = interviewsData?.length || 0;
-            const totalSelected = interviewsData?.filter(interview => interview.result === 'selected').length || 0;
-            const totalRejected = interviewsData?.filter(interview => interview.result === 'not_selected').length || 0;
-
-            setStats({
-                totalApproved,
-                totalInterviews,
-                totalSelected,
-                totalRejected
-            });
-
-        } catch (err) {
-            setError('Failed to fetch data');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            setLoading(true);
-            setError(null);
-            setSuccess(null);
-
-            // Ensure application ID is selected
-            if (!formData.application_id) {
-                setError('Please select an application.');
-                setLoading(false);
-                return;
-            }
-
-            // Combine date and time
-            const dateTime = new Date(`${formData.interview_date}T${formData.interview_time}`);
-
-            const { error } = await supabase
-                .from('interviews')
-                .insert({
-                    application_id: formData.application_id,
-                    interview_date: dateTime.toISOString(),
-                    interview_type: formData.interview_type,
-                    location: formData.location || null,
-                    meeting_link: formData.meeting_link || null,
-                    notes: formData.notes || null
-                });
-
-            if (error) throw error;
-
-            setSuccess('Interview scheduled successfully');
-            setFormData({
-                application_id: '',
-                interview_date: '',
-                interview_time: '',
-                interview_type: 'technical',
-                location: '',
-                meeting_link: '',
-                notes: ''
-            });
-
-            fetchData(); // Refresh data
-
-        } catch (err) {
-            setError('Failed to schedule interview');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const updateInterviewResult = async (interviewId, result) => {
-        try {
-            setProcessingId(interviewId);
-            setError(null);
-
-            const { error } = await supabase
-                .from('interviews')
-                .update({
-                    result,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', interviewId);
-
-            if (error) throw error;
-
-            // Optimistically update the state
-            setInterviews(prev =>
-                prev.map(interview =>
-                    interview.id === interviewId
-                        ? { ...interview, result }
-                        : interview
-                )
-            );
-
-            fetchData(); // Refresh stats
-
-        } catch (err) {
-            setError('Failed to update interview result');
-            console.error(err);
-        } finally {
-            setProcessingId(null);
-        }
-    };
-
-    const formatDateTime = (dateString) => {
-        const options = {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    };
-
-    return (
-        <div className="min-h-screen bg-base-200">
-            <AppNavbar />
-            <div className="p-4">
-                <h2 className="text-2xl font-bold mb-6">Interview Management</h2>
-
-                {/* Stats Summary */}
-                <div className="stats shadow mb-6 w-full">
-                    <div className="stat">
-                        <div className="stat-title">Total Approved</div>
-                        <div className="stat-value">{stats.totalApproved}</div>
-                        <div className="stat-desc">Applications approved</div>
-                    </div>
-
-                    <div className="stat">
-                        <div className="stat-title">Interviews</div>
-                        <div className="stat-value">{stats.totalInterviews}</div>
-                        <div className="stat-desc">Scheduled interviews</div>
-                    </div>
-
-                    <div className="stat">
-                        <div className="stat-title">Selected</div>
-                        <div className="stat-value text-success">{stats.totalSelected}</div>
-                        <div className="stat-desc">Candidates selected</div>
-                    </div>
-
-                    <div className="stat">
-                        <div className="stat-title">Rejected</div>
-                        <div className="stat-value text-error">{stats.totalRejected}</div>
-                        <div className="stat-desc">Candidates rejected</div>
-                    </div>
-                </div>
-
-                {error && (
-                    <div className="alert alert-error mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>{error}</span>
-                        <button className="btn btn-sm" onClick={() => setError(null)}>Dismiss</button>
-                    </div>
-                )}
-
-                {success && (
-                    <div className="alert alert-success mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>{success}</span>
-                        <button className="btn btn-sm" onClick={() => setSuccess(null)}>Dismiss</button>
-                    </div>
-                )}
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Schedule Interview Form */}
-                    <div className="card bg-base-100 shadow-xl">
-                        <div className="card-body">
-                            <h3 className="card-title">Schedule New Interview</h3>
-
-                            {pendingApplications.length === 0 ? (
-                                <div className="alert">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <span>No pending applications that need interviews.</span>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleSubmit}>
-                                    <div className="form-control mb-4">
-                                        <label className="label">
-                                            <span className="label-text">Select Candidate</span>
-                                        </label>
-                                        <select
-                                            name="application_id"
-                                            value={formData.application_id}
-                                            onChange={handleChange}
-                                            className="select select-bordered w-full"
-                                            required
-                                        >
-                                            <option value="" disabled>Select an approved candidate</option>
-                                            {pendingApplications.map(app => (
-                                                <option key={app.id} value={app.id}>
-                                                    {app.student_profiles?.full_name} - {app.jobs?.title}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                        <div className="form-control">
-                                            <label className="label">
-                                                <span className="label-text">Interview Date</span>
-                                            </label>
-                                            <input
-                                                type="date"
-                                                name="interview_date"
-                                                value={formData.interview_date}
-                                                onChange={handleChange}
-                                                className="input input-bordered"
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="form-control">
-                                            <label className="label">
-                                                <span className="label-text">Interview Time</span>
-                                            </label>
-                                            <input
-                                                type="time"
-                                                name="interview_time"
-                                                value={formData.interview_time}
-                                                onChange={handleChange}
-                                                className="input input-bordered"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="form-control mb-4">
-                                        <label className="label">
-                                            <span className="label-text">Interview Type</span>
-                                        </label>
-                                        <select
-                                            name="interview_type"
-                                            value={formData.interview_type}
-                                            onChange={handleChange}
-                                            className="select select-bordered w-full"
-                                            required
-                                        >
-                                            <option value="technical">Technical</option>
-                                            <option value="hr">HR</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                        <div className="form-control">
-                                            <label className="label">
-                                                <span className="label-text">Location (if in-person)</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="location"
-                                                value={formData.location}
-                                                onChange={handleChange}
-                                                className="input input-bordered"
-                                                placeholder="Office address or room number"
-                                            />
-                                        </div>
-
-                                        <div className="form-control">
-                                            <label className="label">
-                                                <span className="label-text">Meeting Link (if virtual)</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="meeting_link"
-                                                value={formData.meeting_link}
-                                                onChange={handleChange}
-                                                className="input input-bordered"
-                                                placeholder="Zoom/Teams/Meet link"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="form-control mb-4">
-                                        <label className="label">
-                                            <span className="label-text">Notes (optional)</span>
-                                        </label>
-                                        <textarea
-                                            name="notes"
-                                            value={formData.notes}
-                                            onChange={handleChange}
-                                            className="textarea textarea-bordered"
-                                            placeholder="Additional instructions for the candidate"
-                                        ></textarea>
-                                    </div>
-
-                                    <div className="form-control mt-6">
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary"
-                                            disabled={loading}
-                                        >
-                                            {loading ? <span className="loading loading-spinner"></span> : 'Schedule Interview'}
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Interviews List */}
-                    <div className="card bg-base-100 shadow-xl">
-                        <div className="card-body">
-                            <h3 className="card-title">Scheduled Interviews</h3>
-
-                            {loading ? (
-                                <div className="flex justify-center items-center h-64">
-                                    <span className="loading loading-spinner loading-lg"></span>
-                                </div>
-                            ) : interviews.length === 0 ? (
-                                <div className="alert">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <span>No interviews scheduled yet.</span>
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="table w-full">
-                                        <thead>
-                                            <tr>
-                                                <th>Candidate</th>
-                                                <th>Position</th>
-                                                <th>Date & Time</th>
-                                                <th>Type</th>
-                                                <th>Result</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {interviews.map(interview => (
-                                                <tr key={interview.id}>
-                                                    <td>{interview.applications?.student_profiles?.full_name}</td>
-                                                    <td>{interview.applications?.jobs?.title}</td>
-                                                    <td>{formatDateTime(interview.interview_date)}</td>
-                                                    <td>
-                                                        <span className="badge">
-                                                            {interview.interview_type}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        {interview.result === 'selected' && (
-                                                            <span className="badge badge-success">Selected</span>
-                                                        )}
-                                                        {interview.result === 'not_selected' && (
-                                                            <span className="badge badge-error">Rejected</span>
-                                                        )}
-                                                        {interview.result==null && (
-                                                            <span className="badge badge-ghost">Pending</span>
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        {!interview.result & (
-                                                            <div className="flex gap-2">
-                                                                <button
-                                                                    className="btn btn-xs btn-success"
-                                                                    disabled={processingId === interview.id}
-                                                                    onClick={() => updateInterviewResult(interview.id, 'selected')}
-                                                                >
-                                                                    {processingId === interview.id ?
-                                                                        <span className="loading loading-spinner loading-xs"></span> :
-                                                                        'Select'
-                                                                    }
-                                                                </button>
-                                                                <button
-                                                                    className="btn btn-xs btn-error"
-                                                                    disabled={processingId === interview.id}
-                                                                    onClick={() => updateInterviewResult(interview.id, 'not_selected')}
-                                                                >
-                                                                    {processingId === interview.id ?
-                                                                        <span className="loading loading-spinner loading-xs"></span> :
-                                                                        'Reject'
-                                                                    }
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                        <details className="collapse mt-2">
-                                                            <summary className="collapse-title text-xs p-0 min-h-0">View Details</summary>
-                                                            <div className="collapse-content text-xs p-2 bg-base-200">
-                                                                {interview.location && <p><strong>Location:</strong> {interview.location}</p>}
-                                                                {interview.meeting_link && (
-                                                                    <p>
-                                                                        <strong>Meeting:</strong>
-                                                                        <a href={interview.meeting_link} target="_blank" rel="noopener noreferrer" className="link link-primary">
-                                                                            Join Link
-                                                                        </a>
-                                                                    </p>
-                                                                )}
-                                                                {interview.notes && <p><strong>Notes:</strong> {interview.notes}</p>}
-                                                            </div>
-                                                        </details>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+  return (
+    <div className="min-h-screen bg-base-100">
+      {/* Navbar */}
+      <Navbar />
+      <div className="hero min-h-[70vh] bg-base-200">
+        <div className="hero-content flex-col lg:flex-row-reverse">
+          <img
+            src="./image.png"
+            alt="Placement Success"
+            className="max-w-sm w-5/12 rounded-lg shadow-2xl transform transition hover:scale-105"
+          />
+          <div className='w-7/12'>
+            <h1 className="text-5xl font-bold">Unlock Your Career Potential</h1>
+            <p className="py-6 text-lg">
+              Empowering students with transformative career opportunities,
+              strategic networking, and professional development resources.
+            </p>
+            <div className="space-x-4">
+              <Link to="/register" className="btn btn-primary">Get Started</Link>
+              <Link to="/jobs" className="btn btn-outline btn-secondary">Browse Jobs</Link>
             </div>
+          </div>
         </div>
-    );
-};
+      </div>
 
-export default InterviewSchedule;
+      {/* Stats Section */}
+      <div className="stats shadow w-full bg-base-100 py-10 px-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+        {[
+          { icon: <Users />, title: "Partner Companies", value: stats.companies },
+          { icon: <Briefcase />, title: "Available Positions", value: stats.jobs },
+          { icon: <Award />, title: "Placement Rate", value: stats.placements }
+        ].map((stat, idx) => (
+          <div key={idx} className="stat bg-base-200 rounded-lg p-6 hover:shadow-xl transition">
+            <div className="stat-figure text-primary">{stat.icon}</div>
+            <div className="stat-value text-4xl">{stat.value}+</div>
+            <div className="stat-title">{stat.title}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Features Section */}
+      <div id="features" className="py-16 bg-base-200">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-12">How It Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <CheckCircle className="mx-auto mb-4 text-primary" size={48} />,
+                title: "Create Profile",
+                description: "Build a comprehensive professional profile showcasing your skills and achievements."
+              },
+              {
+                icon: <Briefcase className="mx-auto mb-4 text-primary" size={48} />,
+                title: "Discover Opportunities",
+                description: "Access a curated database of internships, jobs, and placement openings."
+              },
+              {
+                icon: <Award className="mx-auto mb-4 text-primary" size={48} />,
+                title: "Apply & Succeed",
+                description: "Leverage our resources and network to land your dream career opportunity."
+              }
+            ].map((feature, idx) => (
+              <div
+                key={idx}
+                className="card bg-base-100 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2"
+              >
+                <div className="card-body items-center text-center">
+                  {feature.icon}
+                  <h3 className="card-title">{feature.title}</h3>
+                  <p>{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div id="testimonials" className="py-16 bg-base-100">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-12">Success Stories</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, idx) => (
+              <div
+                key={idx}
+                className="card bg-base-200 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2"
+              >
+                <div className="card-body">
+                  <div className="flex items-center mb-4">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-16 h-16 rounded-full mr-4"
+                    />
+                    <div>
+                      <h3 className="font-bold">{testimonial.name}</h3>
+                      <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    </div>
+                  </div>
+                  <p className="italic">"{testimonial.quote}"</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Section */}
+      <div id="contact" className="py-16 bg-base-200">
+        <div className="container mx-auto">
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h2 className="card-title text-4xl mb-8 text-center">Contact Us</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <div className="form-control mb-4">
+                    <label className="label">
+                      <span className="label-text">Name</span>
+                    </label>
+                    <input type="text" placeholder="Your Name" className="input input-bordered" />
+                  </div>
+                  <div className="form-control mb-4">
+                    <label className="label">
+                      <span className="label-text">Email</span>
+                    </label>
+                    <input type="email" placeholder="Your Email" className="input input-bordered" />
+                  </div>
+                  <div className="form-control mb-4">
+                    <label className="label">
+                      <span className="label-text">Message</span>
+                    </label>
+                    <textarea className="textarea textarea-bordered h-24" placeholder="Your Message"></textarea>
+                  </div>
+                  <button className="btn btn-primary w-full">Send Message</button>
+                </div>
+                <div className="bg-base-200 p-6 rounded-lg">
+                  <h3 className="text-2xl font-bold mb-4">Contact Information</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <MapPin className="mr-4 text-primary" />
+                      <p>123 Career Street, Education City</p>
+                    </div>
+                    <div className="flex items-center">
+                      <Phone className="mr-4 text-primary" />
+                      <p>+1 (555) 123-4567</p>
+                    </div>
+                    <div className="flex items-center">
+                      <Mail className="mr-4 text-primary" />
+                      <p>placement@college.edu</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="footer p-10 bg-base-300 text-base-content">
+        <div>
+          <span className="footer-title">Quick Links</span>
+          <a className="link link-hover">About us</a>
+          <a className="link link-hover">Jobs</a>
+          <a className="link link-hover">Workshops</a>
+        </div>
+        <div>
+          <span className="footer-title">Company</span>
+          <a className="link link-hover">Privacy Policy</a>
+          <a className="link link-hover">Terms of Service</a>
+          <a className="link link-hover">Contact</a>
+        </div>
+        <div>
+          <span className="footer-title">Social</span>
+          <div className="grid grid-flow-col gap-4">
+            <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg></a>
+            <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg></a>
+            <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path></svg></a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

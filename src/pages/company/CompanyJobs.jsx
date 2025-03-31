@@ -96,7 +96,7 @@ export default function CompanyJobs() {
   };
   
   return (
-    <div className="min-h-screen bg-base-100">
+    <div className="min-h-screen bg-gray-100">
       <AppNavbar />
       
       <div className="container mx-auto px-4 py-8">
@@ -124,9 +124,6 @@ export default function CompanyJobs() {
             {/* Filter Dropdown */}
             <div className="form-control">
               <div className="input-group">
-                <span className="btn btn-square btn-secondary">
-                  <Filter size={18} />
-                </span>
                 <select 
                   value={statusFilter} 
                   onChange={(e) => setStatusFilter(e.target.value)}
@@ -172,9 +169,9 @@ export default function CompanyJobs() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredJobs.map((job) => (
-              <div key={job.id} className="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow w-9/12 mx-auto">
+              <div key={job.id} className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow mx-auto">
                 <div className="card-body">
                   <div className="flex justify-between items-start">
                     <div>

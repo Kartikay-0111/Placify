@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
@@ -26,11 +26,11 @@ export default function CompanyDashboard() {
 
   useEffect(() => {
     if (!user) return;
-    
+
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch company profile
         const { data: profileData } = await supabase
           .from('company_profiles')
@@ -38,55 +38,55 @@ export default function CompanyDashboard() {
           .eq('user_id', user.id)
           .single();
         setCompanyProfile(profileData);
-        
+
         // Fetch jobs
         const { data: jobs } = await supabase
           .from('jobs')
           .select('id, title, job_type, status, application_deadline, created_at')
           .eq('company_id', user.id)
           .order('created_at', { ascending: false });
-        
+
         const activeJobs = jobs ? jobs.filter(job => job.status === 'published').length : 0;
         const completedJobs = jobs ? jobs.filter(job => job.status === 'closed').length : 0;
-        
+
         // Fetch applications
         const { data: applications } = await supabase
           .from('applications')
           .select('id, status, job_id, updated_at')
           .in('job_id', jobs ? jobs.map(job => job.id) : []);
-        
+
         const totalApplications = applications ? applications.length : 0;
         const pendingReviews = applications ? applications.filter(app => app.status === 'cell_approved').length : 0;
-        
+
         // Create application trends data (last 7 days)
         const today = new Date();
         const applicationTrends = Array(7).fill().map((_, i) => {
           const date = new Date(today);
           date.setDate(date.getDate() - (6 - i));
           const dateStr = date.toISOString().split('T')[0];
-          
+
           const count = applications ? applications.filter(app => {
             const appDate = new Date(app.updated_at).toISOString().split('T')[0];
             return appDate === dateStr;
           }).length : 0;
-          
+
           return {
             date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             count
           };
         });
-        
+
         // Create status distribution data
         const statusCounts = applications ? applications.reduce((acc, app) => {
           acc[app.status] = (acc[app.status] || 0) + 1;
           return acc;
         }, {}) : {};
-        
+
         const statusDistribution = Object.keys(statusCounts).map(status => ({
           name: status.replace('_', ' '),
           value: statusCounts[status]
         }));
-        
+
         setDashboardData({
           activeJobs,
           totalApplications,
@@ -102,34 +102,27 @@ export default function CompanyDashboard() {
         setLoading(false);
       }
     };
-    
+
     fetchDashboardData();
   }, [user]);
 
   // Colors for the charts
   const COLORS = ['#4C51BF', '#38B2AC', '#ED8936', '#ECC94B', '#F56565'];
-  
+
   return (
     <div className="min-h-screen bg-gray-100">
       <AppNavbar />
-      
+
       <div className="drawer lg:drawer-open">
         <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col p-4 lg:p-8">
           {/* Top bar */}
           <div className="navbar bg-base-100 rounded-lg shadow-md mb-6">
-            <div className="flex-none lg:hidden">
-              <label htmlFor="dashboard-drawer" className="btn btn-square btn-ghost">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-              </label>
-            </div>
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-primary">Look at the report in your dashboard</h1>
             </div>
           </div>
-          
+
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -147,7 +140,7 @@ export default function CompanyDashboard() {
                   <div className="stat-desc">Job postings currently live</div>
                 </div>
               </div>
-              
+
               <div className="stats shadow bg-secondary text-secondary-content">
                 <div className="stat">
                   <div className="stat-figure text-secondary-content">
@@ -158,7 +151,7 @@ export default function CompanyDashboard() {
                   <div className="stat-desc">Total candidates applied</div>
                 </div>
               </div>
-              
+
               <div className="stats shadow bg-accent text-accent-content">
                 <div className="stat">
                   <div className="stat-figure text-accent-content">
@@ -169,7 +162,7 @@ export default function CompanyDashboard() {
                   <div className="stat-desc">Applications needing attention</div>
                 </div>
               </div>
-              
+
               {/* Application Trends Chart */}
               <div className="card shadow-lg bg-base-100 col-span-1 lg:col-span-2">
                 <div className="card-body">
@@ -191,7 +184,7 @@ export default function CompanyDashboard() {
                   <p className="text-sm text-gray-500">Applications received over last 7 days</p>
                 </div>
               </div>
-              
+
               {/* Application Status Distribution */}
               <div className="card shadow-lg bg-base-100">
                 <div className="card-body">
@@ -222,7 +215,7 @@ export default function CompanyDashboard() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Quick Actions */}
               <div className="card shadow-lg bg-base-100">
                 <div className="card-body">
@@ -245,7 +238,7 @@ export default function CompanyDashboard() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Recent Jobs Table */}
               <div className="card shadow-lg bg-base-100 col-span-1 lg:col-span-2">
                 <div className="card-body">
@@ -299,11 +292,11 @@ export default function CompanyDashboard() {
                   </div>
                 </div>
               </div>
-              
+
             </div>
           )}
         </div>
-        
+
         {/* Sidebar */}
         {/* <div className="drawer-side">
           <label htmlFor="dashboard-drawer" className="drawer-overlay"></label>

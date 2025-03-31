@@ -60,9 +60,8 @@ export default function EditJob() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <AppNavbar />
-      
-      <main className="flex-1 pt-6 pb-12 px-4 md:px-8 lg:px-12">
-        <div className="max-w-4xl mx-auto bg-white p-6 shadow-md rounded-lg">
+      <main className="flex-1 pb-12 px-4 pt-4 md:px-8 lg:px-12">
+        <div className="max-w-4xl mx-auto bg-white p-4 shadow-md rounded-lg">
           <h1 className="text-2xl font-bold mb-2">Edit Job</h1>
           <p className="text-gray-600 mb-4">Update your job posting details.</p>
 
@@ -83,3 +82,4 @@ export default function EditJob() {
     </div>
   );
 }
+  

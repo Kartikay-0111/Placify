@@ -1,247 +1,680 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from '@/components/AppNavbar';
+import React from "react"
 import {
   Users,
   Briefcase,
-  Award,
   CheckCircle,
-  MessageCircle,
-  MapPin,
+  ArrowRight,
+  Building,
+  GraduationCap,
+  FileCheck,
+  Calendar,
+  Award,
+  ChevronDown,
+  ChevronUp,
   Mail,
-  Phone
-} from 'lucide-react';
+  Phone,
+  MapPin,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+} from "lucide-react"
+import {Link} from 'react-router-dom'
+import AppNavbar from "@/components/AppNavbar"
+// import img from "next/img"
 
-// Dummy Testimonial Data
-const testimonials = [
-  {
-    name: "John Doe",
-    role: "Software Engineer at Google",
-    image: "/api/placeholder/100/100",
-    quote: "The placement cell was instrumental in helping me secure my dream job. Their support and guidance were exceptional."
-  },
-  {
-    name: "Jane Smith",
-    role: "Product Manager at Microsoft",
-    image: "/api/placeholder/100/100",
-    quote: "I'm grateful for the comprehensive support and networking opportunities provided by the placement cell."
-  },
-  {
-    name: "Mike Johnson",
-    role: "Data Scientist at Amazon",
-    image: "/api/placeholder/100/100",
-    quote: "The placement resources and workshops were key to my successful career launch."
+export default function LandingPage() {
+  const [activeTab, setActiveTab] = React.useState(1)
+  const [activeFaq, setActiveFaq] = React.useState(null)
+
+  const toggleFaq = (index) => {
+    if (activeFaq === index) {
+      setActiveFaq(null)
+    } else {
+      setActiveFaq(index)
+    }
   }
-];
-
-export default function PlacementCellLandingPage() {
-  const [stats, setStats] = useState({ companies: 0, jobs: 0, placements: 0 });
-
-  useEffect(() => {
-    const targetStats = { companies: 50, jobs: 120, placements: 85 };
-    const duration = 2000;
-    const frameRate = 20;
-    const totalFrames = duration / frameRate;
-    let frame = 0;
-
-    const timer = setInterval(() => {
-      frame++;
-      const progress = frame / totalFrames;
-      if (frame <= totalFrames) {
-        setStats({
-          companies: Math.floor(targetStats.companies * progress),
-          jobs: Math.floor(targetStats.jobs * progress),
-          placements: Math.floor(targetStats.placements * progress),
-        });
-      } else {
-        clearInterval(timer);
-      }
-    }, frameRate);
-
-    return () => clearInterval(timer);
-  }, []);
 
   return (
-    <div className="min-h-screen bg-base-100">
-      {/* Navbar */}
-      <Navbar />
-      <div className="hero min-h-[70vh] bg-base-200">
-        <div className="hero-content flex-col lg:flex-row-reverse">
-          <img
-            src="./image.png"
-            alt="Placement Success"
-            className="max-w-sm w-5/12 rounded-lg shadow-2xl transform transition hover:scale-105"
-          />
-          <div className='w-7/12'>
-            <h1 className="text-5xl font-bold">Unlock Your Career Potential</h1>
-            <p className="py-6 text-lg">
-              Empowering students with transformative career opportunities,
-              strategic networking, and professional development resources.
-            </p>
-            <div className="space-x-4">
-              <Link to="/register" className="btn btn-primary">Get Started</Link>
-              <Link to="/jobs" className="btn btn-outline btn-secondary">Browse Jobs</Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="stats shadow w-full bg-base-100 py-10 px-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-        {[
-          { icon: <Users />, title: "Partner Companies", value: stats.companies },
-          { icon: <Briefcase />, title: "Available Positions", value: stats.jobs },
-          { icon: <Award />, title: "Placement Rate", value: stats.placements }
-        ].map((stat, idx) => (
-          <div key={idx} className="stat bg-base-200 rounded-lg p-6 hover:shadow-xl transition">
-            <div className="stat-figure text-primary">{stat.icon}</div>
-            <div className="stat-value text-4xl">{stat.value}+</div>
-            <div className="stat-title">{stat.title}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Features Section */}
-      <div id="features" className="py-16 bg-base-200">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-12">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <CheckCircle className="mx-auto mb-4 text-primary" size={48} />,
-                title: "Create Profile",
-                description: "Build a comprehensive professional profile showcasing your skills and achievements."
-              },
-              {
-                icon: <Briefcase className="mx-auto mb-4 text-primary" size={48} />,
-                title: "Discover Opportunities",
-                description: "Access a curated database of internships, jobs, and placement openings."
-              },
-              {
-                icon: <Award className="mx-auto mb-4 text-primary" size={48} />,
-                title: "Apply & Succeed",
-                description: "Leverage our resources and network to land your dream career opportunity."
-              }
-            ].map((feature, idx) => (
-              <div
-                key={idx}
-                className="card bg-base-100 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2"
-              >
-                <div className="card-body items-center text-center">
-                  {feature.icon}
-                  <h3 className="card-title">{feature.title}</h3>
-                  <p>{feature.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Testimonials Section */}
-      <div id="testimonials" className="py-16 bg-base-100">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-12">Success Stories</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, idx) => (
-              <div
-                key={idx}
-                className="card bg-base-200 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-2"
-              >
-                <div className="card-body">
-                  <div className="flex items-center mb-4">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-16 h-16 rounded-full mr-4"
-                    />
-                    <div>
-                      <h3 className="font-bold">{testimonial.name}</h3>
-                      <p className="text-sm text-gray-600">{testimonial.role}</p>
-                    </div>
-                  </div>
-                  <p className="italic">"{testimonial.quote}"</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Contact Section */}
-      <div id="contact" className="py-16 bg-base-200">
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="container mx-auto">
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <h2 className="card-title text-4xl mb-8 text-center">Contact Us</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Name</span>
-                    </label>
-                    <input type="text" placeholder="Your Name" className="input input-bordered" />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Email</span>
-                    </label>
-                    <input type="email" placeholder="Your Email" className="input input-bordered" />
-                  </div>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">Message</span>
-                    </label>
-                    <textarea className="textarea textarea-bordered h-24" placeholder="Your Message"></textarea>
-                  </div>
-                  <button className="btn btn-primary w-full">Send Message</button>
+            <AppNavbar />
+        </div>
+      </header>
+
+      <main>
+        {/* Hero Section */}
+        <section className="bg-gradient-to-b from-white to-primary/5 py-16 md:py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                  Unlock Your <span className="text-primary">Career Potential</span>
+                </h1>
+                <p className="text-lg md:text-xl text-gray-600 max-w-lg">
+                  Empowering students with transformative career opportunities, strategic networking, and professional
+                  development resources.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    to="/register"
+                    className="inline-flex justify-center items-center px-6 py-3 text-base font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Get Started
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                  <Link
+                    to="/jobs"
+                    className="inline-flex justify-center items-center px-6 py-3 text-base font-medium text-primary bg-white border border-primary rounded-md hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Browse Jobs
+                  </Link>
                 </div>
-                <div className="bg-base-200 p-6 rounded-lg">
-                  <h3 className="text-2xl font-bold mb-4">Contact Information</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center">
-                      <MapPin className="mr-4 text-primary" />
-                      <p>123 Career Street, Education City</p>
+              </div>
+              <div className="flex justify-center">
+                <img
+                  src="undraw_career-progress.png"
+                  alt="Career Growth Illustration"
+                  width={500}
+                  height={400}
+                  className="rounded-lg shadow-lg hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Statistics Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-primary/5 rounded-lg p-8 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex justify-center mb-4">
+                  <Building className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="text-4xl font-bold text-gray-900 mb-2">50+</h3>
+                <p className="text-lg text-gray-600">Partner Companies</p>
+              </div>
+              <div className="bg-primary/5 rounded-lg p-8 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex justify-center mb-4">
+                  <Briefcase className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="text-4xl font-bold text-gray-900 mb-2">120+</h3>
+                <p className="text-lg text-gray-600">Available Positions</p>
+              </div>
+              <div className="bg-primary/5 rounded-lg p-8 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex justify-center mb-4">
+                  <Award className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="text-4xl font-bold text-gray-900 mb-2">85%</h3>
+                <p className="text-lg text-gray-600">Placement Rate</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section className="py-16 bg-primary/5">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">How Placify Works</h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Our streamlined process connects students, colleges, and companies for a seamless placement experience.
+              </p>
+            </div>
+
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <button
+                  type="button"
+                  className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
+                    activeTab === 1 ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-primary/5"
+                  }`}
+                  onClick={() => setActiveTab(1)}
+                >
+                  For Students
+                </button>
+                <button
+                  type="button"
+                  className={`px-4 py-2 text-sm font-medium ${
+                    activeTab === 2 ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-primary/5"
+                  }`}
+                  onClick={() => setActiveTab(2)}
+                >
+                  For Companies
+                </button>
+                <button
+                  type="button"
+                  className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
+                    activeTab === 3 ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-primary/5"
+                  }`}
+                  onClick={() => setActiveTab(3)}
+                >
+                  For Placement Cells
+                </button>
+              </div>
+            </div>
+
+            {activeTab === 1 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      1
                     </div>
-                    <div className="flex items-center">
-                      <Phone className="mr-4 text-primary" />
-                      <p>+1 (555) 123-4567</p>
-                    </div>
-                    <div className="flex items-center">
-                      <Mail className="mr-4 text-primary" />
-                      <p>placement@college.edu</p>
-                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Sign Up & Complete Profile</h3>
                   </div>
+                  <p className="text-gray-600">
+                    Create your account and build a comprehensive profile showcasing your skills and achievements.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      2
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Apply for Jobs</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    Browse and apply for positions that match your skills and career aspirations.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      3
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Get Hired</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    Participate in interviews, receive and accept offers, and launch your career.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 2 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      1
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Register Your Company</h3>
+                  </div>
+                  <p className="text-gray-600">Create a company profile and get verified to access our talent pool.</p>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      2
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Post Job Opportunities</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    List your open positions with detailed requirements and select eligible colleges.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      3
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Hire Top Talent</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    Review applications, conduct interviews, and onboard the best candidates.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 3 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      1
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Manage Student Profiles</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    Verify and approve student profiles to ensure quality and authenticity.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      2
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Review Job Listings</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    Approve job postings from companies to ensure they meet your institution's standards.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary mr-4">
+                      3
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900">Track Placement Progress</h3>
+                  </div>
+                  <p className="text-gray-600">
+                    Monitor application statuses, interview schedules, and placement statistics.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Key Features</h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover how Placify streamlines the entire placement process for all stakeholders.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
+                  <Users className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Multi-Role Authentication</h3>
+                <p className="text-gray-600">
+                  Secure login and signup for students, companies, and placement cell administrators with role-based
+                  access.
+                </p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
+                  <GraduationCap className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Student Profile Management</h3>
+                <p className="text-gray-600">
+                  Comprehensive profiles with academic records, skills, projects, and achievements for better matching.
+                </p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
+                  <Building className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Company Dashboard</h3>
+                <p className="text-gray-600">
+                  Intuitive interface for posting jobs, reviewing applications, and managing the hiring process.
+                </p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
+                  <FileCheck className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Application Tracking</h3>
+                <p className="text-gray-600">
+                  Real-time status updates for applications as they move through the recruitment pipeline.
+                </p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
+                  <Calendar className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Interview Scheduling</h3>
+                <p className="text-gray-600">
+                  Automated scheduling tools to coordinate interviews between students and companies.
+                </p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Offer Management</h3>
+                <p className="text-gray-600">
+                  Digital offer letters with acceptance tracking and placement confirmation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-16 bg-primary/5">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Hear from students, companies, and placement cells who have transformed their recruitment process with
+                Placify.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white rounded-lg p-8 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-full bg-gray-200 mr-4 overflow-hidden">
+                    <img src="female-avatar.png" alt="Student Avatar" width={48} height={48} />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900">Priya Sharma</h4>
+                    <p className="text-sm text-gray-600">Computer Science Student</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 italic">
+                  "Placify made my job search incredibly easy. I could track all my applications in one place and landed
+                  my dream job at a top tech company!"
+                </p>
+                <div className="flex mt-4 text-yellow-400">
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-8 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-full bg-gray-200 mr-4 overflow-hidden">
+                    <img src="young-man-avatar.png" alt="Company Avatar" width={48} height={48} />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900">Rajesh Mehta</h4>
+                    <p className="text-sm text-gray-600">HR Manager, TechSolutions</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 italic">
+                  "Placify has revolutionized our campus recruitment process. We've reduced our hiring time by 40% and
+                  found exceptional talent across multiple colleges."
+                </p>
+                <div className="flex mt-4 text-yellow-400">
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg p-8 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-full bg-gray-200 mr-4 overflow-hidden">
+                    <img src="male-avatar.png" alt="College Avatar" width={48} height={48} />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900">Dr. Anand Kumar</h4>
+                    <p className="text-sm text-gray-600">Placement Officer, Engineering College</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 italic">
+                  "Managing placements for 1000+ students was a nightmare before Placify. Now we have a streamlined
+                  process that has increased our placement rate significantly."
+                </p>
+                <div className="flex mt-4 text-yellow-400">
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                  <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Find answers to common questions about Placify and how it can help you.
+              </p>
+            </div>
+
+            <div className="max-w-3xl mx-auto">
+              <div className="space-y-4">
+                {[
+                  {
+                    question: "How do I sign up for Placify?",
+                    answer:
+                      "Signing up is easy! Click on the 'Sign Up' button, select your role (Student, Company, or Placement Cell), and follow the registration process. Students will need to verify their college email address.",
+                  },
+                  {
+                    question: "Is Placify free for students?",
+                    answer:
+                      "Yes, Placify is completely free for students. We believe in empowering students with the best tools to launch their careers without any financial barriers.",
+                  },
+                  {
+                    question: "How does the verification process work?",
+                    answer:
+                      "After students create their profiles, the college placement cell reviews and verifies their information. Companies are verified by our admin team to ensure authenticity.",
+                  },
+                  {
+                    question: "Can companies target specific colleges?",
+                    answer:
+                      "When posting a job, companies can select specific colleges they want to target, ensuring they reach the right talent pool.",
+                  },
+                  {
+                    question: "How does Placify ensure data privacy?",
+                    answer:
+                      "We take data privacy seriously. All personal information is encrypted and stored securely. We never share your data with third parties without your explicit consent.",
+                  },
+                  {
+                    question: "Can placement cells track student performance?",
+                    answer:
+                      "Yes, placement cells have access to comprehensive analytics dashboards that show application statistics, interview performance, and placement rates.",
+                  },
+                ].map((faq, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      className="flex justify-between items-center w-full px-6 py-4 text-left bg-white hover:bg-primary/5 focus:outline-none"
+                      onClick={() => toggleFaq(index)}
+                    >
+                      <span className="text-lg font-medium text-gray-900">{faq.question}</span>
+                      {activeFaq === index ? (
+                        <ChevronUp className="h-5 w-5 text-primary" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-primary" />
+                      )}
+                    </button>
+                    {activeFaq === index && (
+                      <div className="px-6 py-4 bg-primary/5">
+                        <p className="text-gray-600">{faq.answer}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-16 bg-primary">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Ready to Transform Your Placement Process?
+              </h2>
+              <p className="text-xl text-primary/90 mb-8">
+                Join thousands of students, companies, and colleges already using Placify.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link
+                  to="/register"
+                  className="inline-flex justify-center items-center px-6 py-3 text-base font-medium text-primary bg-white border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Get Started for Free
+                </Link>
+                <Link
+                  to="/contact"
+                  className="inline-flex justify-center items-center px-6 py-3 text-base font-medium text-white bg-transparent border border-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Contact Sales
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
 
       {/* Footer */}
-      <footer className="footer p-10 bg-base-300 text-base-content">
-        <div>
-          <span className="footer-title">Quick Links</span>
-          <a className="link link-hover">About us</a>
-          <a className="link link-hover">Jobs</a>
-          <a className="link link-hover">Workshops</a>
-        </div>
-        <div>
-          <span className="footer-title">Company</span>
-          <a className="link link-hover">Privacy Policy</a>
-          <a className="link link-hover">Terms of Service</a>
-          <a className="link link-hover">Contact</a>
-        </div>
-        <div>
-          <span className="footer-title">Social</span>
-          <div className="grid grid-flow-col gap-4">
-            <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg></a>
-            <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg></a>
-            <a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path></svg></a>
+      <footer className="bg-gray-900 text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <Link to="/" className="flex items-center">
+                <span className="text-2xl font-bold text-primary/80">Placify</span>
+              </Link>
+              <p className="text-gray-400">Streamlining the placement process for students, companies, and colleges.</p>
+              <div className="flex space-x-4">
+                <Link to="#" className="text-gray-400 hover:text-white">
+                  <Facebook className="h-5 w-5" />
+                </Link>
+                <Link to="#" className="text-gray-400 hover:text-white">
+                  <Twitter className="h-5 w-5" />
+                </Link>
+                <Link to="#" className="text-gray-400 hover:text-white">
+                  <Instagram className="h-5 w-5" />
+                </Link>
+                <Link to="#" className="text-gray-400 hover:text-white">
+                  <Linkedin className="h-5 w-5" />
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/" className="text-gray-400 hover:text-white">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="text-gray-400 hover:text-white">
+                    About Us
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/jobs" className="text-gray-400 hover:text-white">
+                    Browse Jobs
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/companies" className="text-gray-400 hover:text-white">
+                    Companies
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/colleges" className="text-gray-400 hover:text-white">
+                    Colleges
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">For Users</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/students" className="text-gray-400 hover:text-white">
+                    Students
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/companies" className="text-gray-400 hover:text-white">
+                    Companies
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/placement-cells" className="text-gray-400 hover:text-white">
+                    Placement Cells
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/blog" className="text-gray-400 hover:text-white">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/resources" className="text-gray-400 hover:text-white">
+                    Resources
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+              <ul className="space-y-2">
+                <li className="flex items-start">
+                  <MapPin className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
+                  <span className="text-gray-400">123 Placement Avenue, Education District, 560001</span>
+                </li>
+                <li className="flex items-center">
+                  <Mail className="h-5 w-5 text-gray-400 mr-2" />
+                  <Link to="mailto:info@placify.com" className="text-gray-400 hover:text-white">
+                    info@placify.com
+                  </Link>
+                </li>
+                <li className="flex items-center">
+                  <Phone className="h-5 w-5 text-gray-400 mr-2" />
+                  <Link to="tel:+919876543210" className="text-gray-400 hover:text-white">
+                    +91 9876 543 210
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} Placify. All rights reserved.</p>
+            <div className="flex space-x-6 mt-4 md:mt-0">
+              <Link to="/privacy" className="text-gray-400 hover:text-white text-sm">
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="text-gray-400 hover:text-white text-sm">
+                Terms of Service
+              </Link>
+              <Link to="/cookies" className="text-gray-400 hover:text-white text-sm">
+                Cookie Policy
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
     </div>
-  );
+  )
 }
+
