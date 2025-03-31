@@ -1,3 +1,4 @@
+![Placify Logo](public/placify-logo.png)
 # Placify - College Placement Management System
 
 Placify is a modern **placement cell management system** that streamlines the job application process for students, companies, and college placement cells.
