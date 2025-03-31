@@ -23,20 +23,20 @@ export default function JobListings() {
   async function fetchJobs(userId) {
     try {
         // Fetch the student's college_id first
-        const { data: studentData, error: studentError } = await supabase
-            .from('users')
-            .select('college_id')
-            .eq('id', userId)
-            .single();
+        // const { data: studentData, error: studentError } = await supabase
+        //     .from('users')
+        //     .select('college_id')
+        //     .eq('id', userId)
+        //     .single();
 
-        if (studentError) throw studentError;
-        if (!studentData) throw new Error('Student not found');
+        // if (studentError) throw studentError;
+        // if (!studentData) throw new Error('Student not found');
 
         // Fetch approved jobs for that college
         const { data: jobs, error: jobsError } = await supabase
             .from('jobs')
             .select('*, job_college_targets!inner(*)')
-            .eq('job_college_targets.college_id', studentData.college_id)
+            .eq('job_college_targets.college_id', user.college_id)
             .eq('job_college_targets.approval_status', 'approved');
 
         if (jobsError) throw jobsError;

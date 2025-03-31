@@ -63,7 +63,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/">
-            <img src="placify-logo.png" alt="P" className="h-12 "/>
+            <img src="/placify-logo.png" alt="P" className="h-12 "/>
             
             </Link>
           </div>

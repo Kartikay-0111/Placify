@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
           // Fetch role from database instead of relying on user_metadata
           const { data: userData, error: userError } = await supabase
             .from('users')
-            .select('role')
+            .select('role, college_id')
             .eq('email', session.user.email)
             .single();
   
@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }) => {
             id: session.user.id,
             email: session.user.email,
             role: userRole,
+            college_id: userData?.college_id || null,
           });
         } else {
           setUser(null);

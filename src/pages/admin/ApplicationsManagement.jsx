@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import AppNavbar from '@/components/AppNavbar';
 import { format } from 'date-fns';
-import { Search, Filter, User, Briefcase, Check, X, RefreshCw, Download } from 'lucide-react';
+import {  User, RefreshCw, Download } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ApplicationsManagement() {
   const { user } = useAuth();
@@ -41,9 +42,31 @@ export default function ApplicationsManagement() {
     if (!user) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase .from('applications')
-        .select(`*, job:jobs(*), student:student_profiles(*)`)
-        .order('updated_at', { ascending: false });
+      // const { data, error } = await supabase 
+      // .from('applications')
+      //   .select(`*, job:jobs(*), student:student_profiles(*)`)
+      //   .order('updated_at', { ascending: false });
+
+      const { data, error } = await supabase
+      .from('applications')
+      .select(`
+        id,
+        status,
+        submitted_at,
+        updated_at,
+        placement_cell_notes,
+        company_notes,
+        student:student_profiles!inner(
+          student_id:user_id,
+          *
+        ),
+        job:jobs!inner(
+          job_id:id,
+          *
+        )
+      `)
+      .eq('student_profiles.college_id', user.college_id)
+      .order('updated_at', { ascending: false });
 
       if (error) throw error;
       setApplications(data || []);

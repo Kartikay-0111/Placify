@@ -49,7 +49,7 @@ export default function LandingPage() {
         <section className="bg-gradient-to-b from-white to-primary/5 py-16 md:py-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
+              <div className="space-y-6" >
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                   Unlock Your <span className="text-primary">Career Potential</span>
                 </h1>

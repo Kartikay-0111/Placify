@@ -72,6 +72,11 @@ export function ProfileForm({ initialData = {}, userId, onSuccess }) {
       return;
     }
     setResumeFile(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setResumeUrl(event.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleAvatarChange = (e) => {
@@ -120,8 +125,8 @@ export function ProfileForm({ initialData = {}, userId, onSuccess }) {
       const profileData = {
         ...restData,
         skills: restData.skills.split(',').map(skill => skill.trim()),
-        resume_url: resumeUrl,
-        avatar_url: avatarUrl,
+        avatar_url: uploadedAvatarUrl || initialData.avatar_url,
+        resume_url: uploadedResumeUrl || initialData.resume_url,
         cgpa: parseFloat(restData.cgpa),
         college_id: selectedCollege,
         updated_at: new Date().toISOString(),
@@ -143,6 +148,9 @@ export function ProfileForm({ initialData = {}, userId, onSuccess }) {
             user_id: userId,
             created_at: new Date().toISOString(),
           });
+          await supabase .from('users')
+          .update({ college_id: selectedCollege })
+          .eq('id', userId);
       }
 
       if (onSuccess) onSuccess();
