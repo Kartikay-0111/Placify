@@ -127,17 +127,17 @@ export function ProfileForm({ initialData = {}, userId, onSuccess }) {
         updated_at: new Date().toISOString(),
       };
 
-      const { data: existingProfile } = await getTable('student_profiles')
+      const { data: existingProfile } = await supabase .from('student_profiles')
         .select('user_id')
         .eq('user_id', userId)
         .single();
 
       if (existingProfile) {
-        await getTable('student_profiles')
+        await supabase .from('student_profiles')
           .update(profileData)
           .eq('user_id', userId);
       } else {
-        await getTable('student_profiles')
+        await supabase .from('student_profiles')
           .insert({
             ...profileData,
             user_id: userId,

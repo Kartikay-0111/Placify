@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTable } from '@/lib/supabase-helpers';
+// import { getTable } from '@/lib/supabase-helpers';
 import { useAuth } from '@/contexts/AuthContext';
 import AppNavbar from '@/components/AppNavbar';
 import { format } from 'date-fns';
@@ -41,7 +41,7 @@ export default function ApplicationsManagement() {
     if (!user) return;
     setLoading(true);
     try {
-      const { data, error } = await getTable('applications')
+      const { data, error } = await supabase .from('applications')
         .select(`*, job:jobs(*), student:student_profiles(*)`)
         .order('updated_at', { ascending: false });
 
@@ -79,7 +79,7 @@ export default function ApplicationsManagement() {
   const handleStatusChange = async () => {
     if (!selectedApp || !status) return;
     try {
-      await getTable('applications').update({
+      await supabase .from('applications').update({
         status,
         placement_cell_notes: notes,
         updated_at: new Date().toISOString(),
