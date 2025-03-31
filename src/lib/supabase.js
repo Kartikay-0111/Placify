@@ -12,59 +12,6 @@ export const UserRoles = {
   COMPANY: 'company'
 };
 
-export const Job = {
-  STATUS: {
-    DRAFT: 'draft',
-    PUBLISHED: 'published',
-    CLOSED: 'closed'
-  }
-};
-
-export const Application = {
-  STATUS: {
-    PENDING: 'pending',
-    CELL_APPROVED: 'cell_approved',
-    CELL_REJECTED: 'cell_rejected',
-    COMPANY_APPROVED: 'company_approved',
-    COMPANY_REJECTED: 'company_rejected'
-  }
-};
-
-// Auth functions
-export async function signUp(email, password, role = UserRoles.STUDENT) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { role }
-    }
-  });
-  return { data, error };
-}
-
-export async function signIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-  return { data, error };
-}
-
-export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  return { error };
-}
-
-export async function getCurrentSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  return { session, error };
-}
-
-export async function getCurrentUser() {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  return { user, error };
-}
-
 // Profile functions
 export async function getProfile(userId, type = 'student') {
   const table = type === 'company' ? 'company_profiles' : 'student_profiles';

@@ -15,27 +15,40 @@ export default function JobListings() {
     location: '',
     minCgpa: '',
   });
-
+  // console.log('User:', user);
   useEffect(() => {
-    fetchJobs();
-  }, []);
+    fetchJobs(user.id);
+  }, [user]);
 
-  async function fetchJobs() {
+  async function fetchJobs(userId) {
     try {
-      const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
+        // Fetch the student's college_id first
+        const { data: studentData, error: studentError } = await supabase
+            .from('users')
+            .select('college_id')
+            .eq('id', userId)
+            .single();
 
-      if (error) throw error;
-      setJobs(data || []);
+        if (studentError) throw studentError;
+        if (!studentData) throw new Error('Student not found');
+
+        // Fetch approved jobs for that college
+        const { data: jobs, error: jobsError } = await supabase
+            .from('jobs')
+            .select('*, job_college_targets!inner(*)')
+            .eq('job_college_targets.college_id', studentData.college_id)
+            .eq('job_college_targets.approval_status', 'approved');
+
+        if (jobsError) throw jobsError;
+        setJobs(jobs || []);
+        setLoading(false);
+        // console.log('Approved Jobs:', jobs);
+        return jobs;
     } catch (error) {
-      console.error('Error fetching jobs:', error.message);
-    } finally {
-      setLoading(false);
+        console.error('Error fetching approved jobs:', error.message);
+        return [];
     }
-  }
+}
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

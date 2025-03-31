@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import JobCard from '@/components/JobCard';
-import ApplicationStatus from '@/components/ApplicationStatus';
 import AppNavbar from '@/components/AppNavbar';
 
 export default function StudentDashboard() {
@@ -24,13 +23,17 @@ export default function StudentDashboard() {
           .eq('user_id', user.id)
           .single();
         setProfile(profileData);
+        const { data: studentData, error: studentError } = await supabase.from('users').select('college_id').eq('id',user.id).single();
+        if (studentError) throw studentError;
+        if (!studentData) throw new Error('Student not found');
 
-        const { data: jobsData } = await supabase
+        const { data: jobsData, error } = await supabase
           .from('jobs')
-          .select('*')
-          .eq('status', 'published')
-          .order('created_at', { ascending: false })
+          .select('*, job_college_targets!inner(*)')
+          .eq('job_college_targets.college_id', studentData.college_id)
+          .eq('job_college_targets.approval_status', 'approved')
           .limit(5);
+
         setJobs(jobsData || []);
 
         const { data: applicationsData } = await supabase
@@ -40,6 +43,8 @@ export default function StudentDashboard() {
           .order('submitted_at', { ascending: false })
           .limit(5);
         setApplications(applicationsData || []);
+
+        // console.log('applicationsData', applicationsData);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -48,6 +53,7 @@ export default function StudentDashboard() {
     };
     if (user) fetchData();
   }, [user]);
+
   function calculateProfileCompleteness(profile) {
     const requiredFields = [
       'full_name', 'roll_number', 'branch',
@@ -171,9 +177,11 @@ export default function StudentDashboard() {
                   <p>Loading applications...</p>
                 ) : applications.length > 0 ? (
                   applications.map(application => (
-                    <div key={application.id} className="p-4 border rounded-md">
-                      <h3 className="text-lg font-semibold">{application.jobs?.title}</h3>
-                      <p className="text-sm text-gray-500">{application.jobs?.company_name} - {application.jobs?.location}</p>
+                    <div key={application.id} className="p-4 border rounded-md flex flex-row items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">{application.jobs?.title}</h3>
+                        <p className="text-sm text-gray-500">{application.jobs?.company_name} - {application.jobs?.location}</p>
+                      </div>
                       <ApplicationStatus status={application.status} />
                     </div>
                   ))

@@ -94,7 +94,7 @@ export default function CompanyJobs() {
       return dateString;
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-base-100">
       <AppNavbar />

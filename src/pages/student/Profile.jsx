@@ -3,7 +3,7 @@ import { User, FileText, Loader } from 'lucide-react';
 import AppNavbar from '@/components/AppNavbar';
 import { ProfileForm } from '@/components/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTable } from '@/lib/supabase-helpers';
+// import { getTable } from '@/lib/supabase-helpers';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -18,7 +18,7 @@ export default function Profile() {
       try {
         setLoading(true);
 
-        const { data, error } = await getTable('student_profiles')
+        const { data, error } = await supabase .from('student_profiles')
           .select('*')
           .eq('user_id', user.id)
           .single();

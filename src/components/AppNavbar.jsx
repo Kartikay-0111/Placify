@@ -34,10 +34,10 @@ export default function AppNavbar() {
           { to: '/company/dashboard', label: 'Dashboard' },
           { to: '/company/jobs', label: 'Manage Jobs' },
           { to: '/company/jobs/new', label: 'Post Job' },
-          { to: '/company/profile', label: 'Profile' }
+          { to: '/company/applications', label: 'Applications' }
         ];
       case 'admin':
-        return [...commonLinks, { to: '/admin', label: 'Dashboard' }, { to: '/admin/jobs', label: 'Manage Jobs' }, { to: '/admin/applications', label: 'Manage Applications' }];
+        return [...commonLinks, { to: '/admin', label: 'Dashboard' }, { to: '/admin/jobs', label: 'Manage Jobs' }, { to: '/admin/applications', label: 'Manage Applications' }, { to: '/admin/students', label: 'Manage Students' }];
       default:
         return commonLinks;
     }
@@ -88,6 +88,14 @@ export default function AppNavbar() {
                     {user.role === 'student' && (
                       <button
                         onClick={() => navigate('/profile')}
+                        className="block w-full text-left py-2 px-4 hover:bg-gray-100"
+                      >
+                        Profile
+                      </button>
+                    )}
+                    {user.role === 'company' && (
+                      <button
+                        onClick={() => navigate('/company/profile')}
                         className="block w-full text-left py-2 px-4 hover:bg-gray-100"
                       >
                         Profile

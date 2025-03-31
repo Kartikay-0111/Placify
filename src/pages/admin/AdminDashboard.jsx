@@ -14,60 +14,94 @@ export default function AdminDashboard() {
     totalStudents: 0,
   });
   const [recentApplications, setRecentApplications] = useState([]);
-
+  
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch counts
-        const { count: jobsCount } = await supabase
-          .from('jobs')
-          .select('*', { count: 'exact', head: true });
-
-        const { count: applicationsCount } = await supabase
-          .from('applications')
-          .select('*', { count: 'exact', head: true });
-
-        const { count: studentsCount } = await supabase
+  
+        if (!user || user.role !== 'admin') return;
+  
+        // Fetch admin's college_id
+        const { data: adminData, error: adminError } = await supabase
           .from('users')
+          .select('college_id')
+          .eq('id', user.id)
+          .single();
+  
+        if (adminError || !adminData?.college_id) {
+          throw new Error('Failed to fetch admin college data.');
+        }
+  
+        const adminCollegeId = adminData.college_id;
+  
+        // Fetch job IDs linked to this college
+        const { data: jobTargets } = await supabase
+          .from('job_college_targets')
+          .select('job_id')
+          .eq('college_id', adminCollegeId);
+  
+        const jobIds = jobTargets?.map((job) => job.job_id) || [];
+  
+        //Fetch student IDs linked to this college
+        const { data: studentProfiles } = await supabase
+          .from('student_profiles')
+          .select('user_id')
+          .eq('college_id', adminCollegeId);
+  
+        const studentIds = studentProfiles?.map((student) => student.user_id) || [];
+  
+        //Fetch counts only for this college
+        const { count: jobsCount } = jobIds.length
+          ? await supabase.from('jobs').select('*', { count: 'exact', head: true }).in('id', jobIds)
+          : { count: 0 };
+  
+        const { count: applicationsCount } = studentIds.length
+          ? await supabase.from('applications').select('*', { count: 'exact', head: true }).in('student_id', studentIds)
+          : { count: 0 };
+  
+        const { count: studentsCount } = await supabase
+          .from('student_profiles')
           .select('*', { count: 'exact', head: true })
-          .eq('role', 'student');
+          .eq('college_id', adminCollegeId);
+  
+        //Fetch recent applications for this college
+        // const { data: recentApplicationsData } = studentIds.length
+        //   ? await supabase
+        //       .from('applications')
+        //       .select(`
+        //         *,
+        //         jobs ( id, title, company_name )
+        //       `)
+        //       .in('student_id', studentIds)
+        //       .order('submitted_at', { ascending: false })
+        //       .limit(5)
+        //   : { data: [] };
 
-        // Fetch recent applications with job and student details
-        const { data: recentApplicationsData } = await supabase
-          .from('applications')
-          .select(`
-            *,
-            jobs (
-              id,
-              title,
-              company_name
-            ),
-            users!applications_student_id_fkey (
-              email
-            )
-          `)
-          .order('submitted_at', { ascending: false })
-          .limit(5);
-
+        const {data: recentApplicationsData, error } = await supabase 
+        .from('applications')
+        .select(`*, job:jobs(id, title, company_name ), student:student_profiles(full_name)`)
+        .order('updated_at', { ascending: false })
+        .limit(5)
+  
         setStats({
           totalJobs: jobsCount || 0,
           totalApplications: applicationsCount || 0,
           totalStudents: studentsCount || 0,
         });
         setRecentApplications(recentApplicationsData || []);
+        // console.log('Recent Applications:', recentApplicationsData);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
         setLoading(false);
       }
     };
-
-    if (user?.role === 'admin') {
-      fetchDashboardData();
-    }
+  
+    fetchDashboardData();
   }, [user]);
+  
+  
 
   if (loading) {
     return (
@@ -114,8 +148,8 @@ export default function AdminDashboard() {
                   <tbody>
                     {recentApplications.map((app) => (
                       <tr key={app.id} className="border-b">
-                        <td className="p-2">{app.users?.email}</td>
-                        <td className="p-2">{app.jobs?.title}</td>
+                        <td className="p-2">{app.student?.full_name}</td>
+                        <td className="p-2">{app.job?.title}</td>
                         <td className="p-2">
                           <span className="px-2 py-1 text-xs rounded bg-gray-100">
                             {app.status}

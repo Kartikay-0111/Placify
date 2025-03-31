@@ -22,7 +22,7 @@ export default function Header() {
       case 'admin':
         return [...commonLinks, { name: 'Dashboard', path: '/admin' }, { name: 'Manage Jobs', path: '/admin/jobs' }, { name: 'Manage Applications', path: '/admin/applications' }];
       case 'company':
-        return [...commonLinks, { name: 'Dashboard', path: '/company/dashboard' }];
+        return [...commonLinks, { name: 'Dashboard', path: '/company/dashboard' },{ name: 'Profile', path: '/company/profile' }];
       case 'student':
       default:
         return [...commonLinks, { name: 'Dashboard', path: '/dashboard' }, { name: 'Applications', path: '/applications' }, { name: 'Profile', path: '/profile' }];

@@ -5,12 +5,15 @@ import { supabase } from '../lib/supabase';
 import { X, Plus, Calendar, Info } from 'lucide-react';
 
 const JobPostingForm = ({ initialFormData = null }) => {
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [requirements, setRequirements] = useState([]);
   const [newRequirement, setNewRequirement] = useState('');
+  const [colleges, setColleges] = useState([]);
+  const [selectedColleges, setSelectedColleges] = useState([]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -23,23 +26,8 @@ const JobPostingForm = ({ initialFormData = null }) => {
     stipend: '',
     eligibility_criteria: '',
     application_deadline: '',
-    status: 'pending',
+    status: 'published',
   });
-
-  useEffect(() => {
-    if (initialFormData) {
-      setFormData(initialFormData);
-      setRequirements(initialFormData.requirements || []);
-    }
-  }, [initialFormData]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
 
   const addRequirement = () => {
     if (newRequirement.trim() !== '') {
@@ -50,6 +38,62 @@ const JobPostingForm = ({ initialFormData = null }) => {
 
   const removeRequirement = (index) => {
     setRequirements(requirements.filter((_, i) => i !== index));
+  };
+
+  useEffect(() => {
+    const fetchColleges = async () => {
+      const { data, error } = await supabase.from('colleges').select('id, name');
+      if (error) {
+        console.error("Error fetching colleges:", error);
+      } else {
+        setColleges(data);
+      }
+    };
+
+    fetchColleges();
+  }, []);
+
+  useEffect(() => {
+    const fetchSelectedColleges = async () => {
+      if (!initialFormData || !initialFormData.id) {
+        console.warn("Skipping fetchSelectedColleges: No initialFormData or job_id");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('job_college_targets')
+        .select('*')
+        .eq('job_id', initialFormData.id);
+
+      if (error) {
+        console.error("Error fetching selected colleges:", error);
+      } else {
+        // console.log("Fetched selected colleges:", data);
+        const collegeIds = data.map((college) => college.college_id);
+        setSelectedColleges(collegeIds);
+        console.log("Selected colleges:", collegeIds);
+      }
+    };
+
+    fetchSelectedColleges();
+  }, [initialFormData]);
+
+  useEffect(() => {
+    if (initialFormData) {
+      setFormData(initialFormData);
+      setRequirements(initialFormData.requirements || []);
+    }
+  }, [initialFormData]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleCollegeSelect = (collegeId) => {
+    setSelectedColleges((prev) =>
+      prev.includes(collegeId) ? prev.filter((id) => id !== collegeId) : [...prev, collegeId]
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -64,7 +108,7 @@ const JobPostingForm = ({ initialFormData = null }) => {
         company_id: user?.id,
         updated_at: new Date(),
       };
-
+      let jobId;
       if (initialFormData) {
         // Update job
         const { error } = await supabase
@@ -73,14 +117,21 @@ const JobPostingForm = ({ initialFormData = null }) => {
           .eq('id', initialFormData.id);
 
         if (error) throw error;
+        jobId = initialFormData.id;
       } else {
         // Create new job
         jobData.created_at = new Date();
-        const { error } = await supabase.from('jobs').insert([jobData]);
-
+        const { data,error } = await supabase.from('jobs').insert([jobData]);
+        
         if (error) throw error;
+        jobId = data[0].id;
       }
-
+      console.log('Job ID:', jobId);
+      
+      await supabase.from('job_college_targets').delete().eq('job_id', jobId);
+      const jobColleges = selectedColleges.map((collegeId) => ({ job_id: jobId, college_id: collegeId }));
+      if (jobColleges.length > 0) await supabase.from('job_college_targets').insert(jobColleges);
+      
       navigate('/jobs');
     } catch (err) {
       console.error('Error saving job:', err);
@@ -231,14 +282,11 @@ const JobPostingForm = ({ initialFormData = null }) => {
                   <input
                     type="datetime-local"
                     name="application_deadline"
-                    value={formData.application_deadline}
+                    value={formData.application_deadline ? formData.application_deadline.slice(0,16) : ''}
                     onChange={handleInputChange}
                     className="input input-bordered w-full"
                     required
                   />
-                  <span className="btn btn-square">
-                    <Calendar size={18} />
-                  </span>
                 </div>
               </div>
             </div>
@@ -310,6 +358,27 @@ const JobPostingForm = ({ initialFormData = null }) => {
               ></textarea>
             </div>
 
+            {/* College Selection */}
+            <div className="form-control mt-6">
+              <label className="label">Target Colleges</label>
+              <div className="dropdown">
+                <div tabIndex={0} className="input input-bordered w-full cursor-pointer">Select Colleges</div>
+                <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full">
+                  {colleges.map((college) => (
+                    <li key={college.id}>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedColleges.includes(college.id)}
+                          onChange={() => handleCollegeSelect(college.id)}
+                        />
+                        {college.name}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
             {/* Form Actions */}
             <div className="card-actions justify-end mt-8">
               <button

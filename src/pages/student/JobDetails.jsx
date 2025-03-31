@@ -140,8 +140,14 @@ export default function JobDetails() {
           </div>
 
           <div className="divider"></div>
-
+          {user.role=='company' && 
           <div className="flex justify-center">
+            <Link to={`/company/jobs/edit/${job.id}`} className="btn btn-primary w-full max-w-xs">
+              Edit Job
+            </Link>
+          </div>}
+
+          {user.role=='student' && <div className="flex justify-center">
             {applicationStatus ? (
               <div className={`badge ${
                 applicationStatus === 'pending' ? 'badge-secondary' : 
@@ -181,7 +187,7 @@ export default function JobDetails() {
                 </div>
               )
             )}
-          </div>
+          </div>}
         </div>
       </div>
     </div>

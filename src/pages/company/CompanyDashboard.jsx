@@ -46,13 +46,13 @@ export default function CompanyDashboard() {
           .eq('company_id', user.id)
           .order('created_at', { ascending: false });
         
-        const activeJobs = jobs ? jobs.filter(job => job.status === 'active').length : 0;
+        const activeJobs = jobs ? jobs.filter(job => job.status === 'published').length : 0;
         const completedJobs = jobs ? jobs.filter(job => job.status === 'closed').length : 0;
         
         // Fetch applications
         const { data: applications } = await supabase
           .from('applications')
-          .select('id, status, job_id, created_at')
+          .select('id, status, job_id, updated_at')
           .in('job_id', jobs ? jobs.map(job => job.id) : []);
         
         const totalApplications = applications ? applications.length : 0;
@@ -66,7 +66,7 @@ export default function CompanyDashboard() {
           const dateStr = date.toISOString().split('T')[0];
           
           const count = applications ? applications.filter(app => {
-            const appDate = new Date(app.created_at).toISOString().split('T')[0];
+            const appDate = new Date(app.updated_at).toISOString().split('T')[0];
             return appDate === dateStr;
           }).length : 0;
           
