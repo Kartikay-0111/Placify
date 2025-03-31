@@ -6,7 +6,7 @@ export default function ProtectedRoute({ allowedRoles }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  console.log("ProtectedRoute - user:", user, "loading:", loading, "allowedRoles:", allowedRoles);
+  // console.log("ProtectedRoute - user:", user, "loading:", loading, "allowedRoles:", allowedRoles);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -22,13 +22,13 @@ export default function ProtectedRoute({ allowedRoles }) {
 
   // If not logged in, redirect to login page
   if (!user) {
-    console.log("User not logged in, redirecting to login");
+    // console.log("User not logged in, redirecting to login");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // If user role is not allowed, redirect to appropriate dashboard
   if (!allowedRoles.includes(user.role)) {
-    console.log(`User role (${user.role}) not allowed, redirecting to appropriate dashboard`);
+    // console.log(`User role (${user.role}) not allowed, redirecting to appropriate dashboard`);
     const roleRedirectPaths = {
       admin: '/admin',
       company: '/company/dashboard',

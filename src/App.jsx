@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
-
+import { useAuth } from "./contexts/AuthContext";
 // Pages
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -26,6 +26,8 @@ import CompanyDashboard from "./pages/company/CompanyDashboard";
 import NewJob from "./pages/company/NewJob";
 import EditJob from "./pages/company/EditJob";
 import ManageApplications from "./pages/company/ManageApplications";
+import InterviewManagement from "./pages/company/InterviewManagement";
+import OfferManagement from "./pages/company/OffersManagement";
 
 const App = () => (
   <BrowserRouter>
@@ -57,6 +59,8 @@ const App = () => (
           <Route path="/company/dashboard" element={<CompanyDashboard />} />
           <Route path="/company/profile" element={<CompanyProfile />} />
           <Route path="/company/applications" element={<ManageApplications />} />
+          <Route path="/company/interview" element={<InterviewManagement />} />
+          <Route path="/company/offers" element={<OfferManagement />} />
           <Route path="/company/jobs" element={<CompanyJobs />} />
           <Route path="/company/jobs/new" element={<NewJob />} />
           <Route path="/company/jobs/edit/:id" element={<EditJob />} />

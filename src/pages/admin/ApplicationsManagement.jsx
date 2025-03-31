@@ -140,7 +140,7 @@ export default function ApplicationsManagement() {
   return (
     <div className="min-h-screen flex flex-col bg-base-100">
       <AppNavbar />
-      <main className="flex-1 pt-20 pb-12 px-4 md:px-8 lg:px-12">
+      <main className="flex-1 pt-10 pb-12 px-4 md:px-8 lg:px-12">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <h1 className="text-3xl font-bold">Applications Management</h1>
@@ -164,9 +164,9 @@ export default function ApplicationsManagement() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="input input-bordered w-full" 
                 />
-                
               </div>
             </div>
+            
             <div className="flex-none w-full md:w-64">
               <div className="input-group">
                 <select 

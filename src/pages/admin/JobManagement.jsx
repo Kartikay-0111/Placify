@@ -157,7 +157,7 @@ export default function AdminJobManagement() {
     <div className="min-h-screen bg-base-200">
       <AppNavbar />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 w-11/12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-primary">Job Management</h1>
@@ -192,9 +192,6 @@ export default function AdminJobManagement() {
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="form-control flex-1">
                 <div className="input-group">
-                  <span className="btn btn-square btn-ghost">
-                    <Search size={18} />
-                  </span>
                   <input
                     type="text"
                     placeholder="Search jobs..."
@@ -207,9 +204,6 @@ export default function AdminJobManagement() {
               
               <div className="form-control sm:w-64">
                 <div className="input-group">
-                  <span className="btn btn-square btn-ghost">
-                    <Filter size={18} />
-                  </span>
                   <select
                     className="select select-bordered w-full"
                     value={statusFilter}

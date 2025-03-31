@@ -3,7 +3,8 @@ import { User, FileText, Loader } from 'lucide-react';
 import AppNavbar from '@/components/AppNavbar';
 import { ProfileForm } from '@/components/ProfileForm';
 import { useAuth } from '@/contexts/AuthContext';
-// import { getTable } from '@/lib/supabase-helpers';
+import { getTable } from '@/lib/supabase-helpers';
+import { supabase } from '@/lib/supabase';
 
 export default function Profile() {
   const { user } = useAuth();

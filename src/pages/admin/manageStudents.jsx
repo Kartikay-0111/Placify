@@ -138,208 +138,212 @@ const AdminStudentManagement = () => {
                 <h1 className="text-3xl font-bold mb-6">Student Management</h1>
 
                 {/* Tabs */}
-                <div className="tabs tabs-boxed mb-6">
-                    <button
-                        className={`tab ${activeTab === 'pending' ? 'tab-active' : ''}`}
-                        onClick={() => setActiveTab('pending')}
-                    >
-                        Pending
-                        <div className="badge badge-secondary ml-2">{pendingStudents.length}</div>
-                    </button>
-                    <button
-                        className={`tab ${activeTab === 'approved' ? 'tab-active' : ''}`}
-                        onClick={() => setActiveTab('approved')}
-                    >
-                        Approved
-                        <div className="badge badge-primary ml-2">{approvedStudents.length}</div>
-                    </button>
-                    <button
-                        className={`tab ${activeTab === 'rejected' ? 'tab-active' : ''}`}
-                        onClick={() => setActiveTab('rejected')}
-                    >
-                        Rejected
-                        <div className="badge badge-error ml-2">{rejectedStudents.length}</div>
-                    </button>
-                </div>
+                <div className='card bg-base-100 shadow-xl'>
+                    <div className='card-body'>
+                        <div className="tabs tabs-boxed mb-6">
+                            <button
+                                className={`tab ${activeTab === 'pending' ? 'tab-active' : ''}`}
+                                onClick={() => setActiveTab('pending')}
+                            >
+                                Pending
+                                <div className="badge badge-secondary ml-2">{pendingStudents.length}</div>
+                            </button>
+                            <button
+                                className={`tab ${activeTab === 'approved' ? 'tab-active' : ''}`}
+                                onClick={() => setActiveTab('approved')}
+                            >
+                                Approved
+                                <div className="badge badge-primary ml-2">{approvedStudents.length}</div>
+                            </button>
+                            <button
+                                className={`tab ${activeTab === 'rejected' ? 'tab-active' : ''}`}
+                                onClick={() => setActiveTab('rejected')}
+                            >
+                                Rejected
+                                <div className="badge badge-error ml-2">{rejectedStudents.length}</div>
+                            </button>
+                        </div>
 
-                {/* Student List */}
-                <div className="overflow-x-auto">
-                    <table className="table w-full">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Roll Number</th>
-                                <th>Branch</th>
-                                <th>Year of Graduation</th>
-                                <th>CGPA</th>
-                                <th>Created At</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {displayStudents.length > 0 ? (
-                                displayStudents.map((student) => (
-                                    <tr key={student.user_id} className="hover">
-                                        <td>
-                                            <div className="flex items-center space-x-3">
-                                                <div className="avatar">
-                                                    <div className="mask mask-squircle w-12 h-12">
-                                                        <img
-                                                            src={student.avatar_url || 'https://via.placeholder.com/40'}
-                                                            alt={student.full_name}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold">{student.full_name}</div>
-                                                    {/* <div className="text-sm opacity-50">{student.users.email}</div> */}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>{student.roll_number}</td>
-                                        <td>{student.branch}</td>
-                                        <td>{student.year_of_graduation}</td>
-                                        <td>{student.cgpa}</td>
-                                        <td>{new Date(student.created_at).toLocaleDateString()}</td>
-                                        <td>
-                                            <button
-                                                className="btn btn-sm btn-primary"
-                                                onClick={() => handleStudentClick(student)}
-                                            >
-                                                View Details
-                                            </button>
-                                        </td>
+                        {/* Student List */}
+                        <div className="overflow-x-auto">
+                            <table className="table w-full">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Roll Number</th>
+                                        <th>Branch</th>
+                                        <th>Year of Graduation</th>
+                                        <th>CGPA</th>
+                                        <th>Created At</th>
+                                        <th>Action</th>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="7" className="text-center py-4">
-                                        No students found in this category.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Student Detail Modal */}
-                {selectedStudent && (
-                    <div className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
-                        <div className="modal-box max-w-3xl">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="avatar">
-                                        <div className="w-16 rounded-full">
-                                            <img
-                                                src={selectedStudent.avatar_url || 'https://via.placeholder.com/64'}
-                                                alt={selectedStudent.full_name}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-bold">{selectedStudent.full_name}</h3>
-                                        {/* <p className="text-gray-500">{selectedStudent.users.email}</p> */}
-                                    </div>
-                                </div>
-                                <button
-                                    className="btn btn-sm btn-circle"
-                                    onClick={() => setIsModalOpen(false)}
-                                >
-                                    ✕
-                                </button>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div className="form-control">
-                                    <label className="label">
-                                        <span className="label-text font-semibold">Roll Number</span>
-                                    </label>
-                                    <input type="text" value={selectedStudent.roll_number || 'N/A'} className="input input-bordered" readOnly />
-                                </div>
-
-                                <div className="form-control">
-                                    <label className="label">
-                                        <span className="label-text font-semibold">Branch</span>
-                                    </label>
-                                    <input type="text" value={selectedStudent.branch || 'N/A'} className="input input-bordered" readOnly />
-                                </div>
-
-                                <div className="form-control">
-                                    <label className="label">
-                                        <span className="label-text font-semibold">Year of Graduation</span>
-                                    </label>
-                                    <input type="text" value={selectedStudent.year_of_graduation || 'N/A'} className="input input-bordered" readOnly />
-                                </div>
-
-                                <div className="form-control">
-                                    <label className="label">
-                                        <span className="label-text font-semibold">CGPA</span>
-                                    </label>
-                                    <input type="text" value={selectedStudent.cgpa || 'N/A'} className="input input-bordered" readOnly />
-                                </div>
-                            </div>
-
-                            <div className="form-control mb-4">
-                                <label className="label">
-                                    <span className="label-text font-semibold">Skills</span>
-                                </label>
-                                <div className="flex flex-wrap gap-2">
-                                    {selectedStudent.skills && selectedStudent.skills.length > 0 ? (
-                                        selectedStudent.skills.map((skill, index) => (
-                                            <div key={index} className="badge badge-primary">{skill}</div>
+                                </thead>
+                                <tbody>
+                                    {displayStudents.length > 0 ? (
+                                        displayStudents.map((student) => (
+                                            <tr key={student.user_id} className="hover">
+                                                <td>
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className="avatar">
+                                                            <div className="mask mask-squircle w-12 h-12">
+                                                                <img
+                                                                    src={student.avatar_url || 'https://via.placeholder.com/40'}
+                                                                    alt={student.full_name}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-bold">{student.full_name}</div>
+                                                            {/* <div className="text-sm opacity-50">{student.users.email}</div> */}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{student.roll_number}</td>
+                                                <td>{student.branch}</td>
+                                                <td>{student.year_of_graduation}</td>
+                                                <td>{student.cgpa}</td>
+                                                <td>{new Date(student.created_at).toLocaleDateString()}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-sm btn-primary"
+                                                        onClick={() => handleStudentClick(student)}
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         ))
                                     ) : (
-                                        <span className="text-gray-500">No skills listed</span>
+                                        <tr>
+                                            <td colSpan="7" className="text-center py-4">
+                                                No students found in this category.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Student Detail Modal */}
+                        {selectedStudent && (
+                            <div className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
+                                <div className="modal-box max-w-3xl">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="avatar">
+                                                <div className="w-16 rounded-full">
+                                                    <img
+                                                        src={selectedStudent.avatar_url || 'https://via.placeholder.com/64'}
+                                                        alt={selectedStudent.full_name}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold">{selectedStudent.full_name}</h3>
+                                                {/* <p className="text-gray-500">{selectedStudent.users.email}</p> */}
+                                            </div>
+                                        </div>
+                                        <button
+                                            className="btn btn-sm btn-circle"
+                                            onClick={() => setIsModalOpen(false)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div className="form-control">
+                                            <label className="label">
+                                                <span className="label-text font-semibold">Roll Number</span>
+                                            </label>
+                                            <input type="text" value={selectedStudent.roll_number || 'N/A'} className="input input-bordered" readOnly />
+                                        </div>
+
+                                        <div className="form-control">
+                                            <label className="label">
+                                                <span className="label-text font-semibold">Branch</span>
+                                            </label>
+                                            <input type="text" value={selectedStudent.branch || 'N/A'} className="input input-bordered" readOnly />
+                                        </div>
+
+                                        <div className="form-control">
+                                            <label className="label">
+                                                <span className="label-text font-semibold">Year of Graduation</span>
+                                            </label>
+                                            <input type="text" value={selectedStudent.year_of_graduation || 'N/A'} className="input input-bordered" readOnly />
+                                        </div>
+
+                                        <div className="form-control">
+                                            <label className="label">
+                                                <span className="label-text font-semibold">CGPA</span>
+                                            </label>
+                                            <input type="text" value={selectedStudent.cgpa || 'N/A'} className="input input-bordered" readOnly />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-control mb-4">
+                                        <label className="label">
+                                            <span className="label-text font-semibold">Skills</span>
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedStudent.skills && selectedStudent.skills.length > 0 ? (
+                                                selectedStudent.skills.map((skill, index) => (
+                                                    <div key={index} className="badge badge-primary">{skill}</div>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-500">No skills listed</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="form-control mb-4">
+                                        <label className="label">
+                                            <span className="label-text font-semibold">About</span>
+                                        </label>
+                                        <textarea
+                                            className="textarea textarea-bordered h-24"
+                                            value={selectedStudent.about || 'No information provided'}
+                                            readOnly
+                                        />
+                                    </div>
+
+                                    {selectedStudent.resume_url && (
+                                        <div className="form-control mb-6">
+                                            <label className="label">
+                                                <span className="label-text font-semibold">Resume</span>
+                                            </label>
+                                            <a
+                                                href={selectedStudent.resume_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn btn-outline"
+                                            >
+                                                View Resume
+                                            </a>
+                                        </div>
+                                    )}
+
+                                    {selectedStudent.status === 'pending' && (
+                                        <div className="modal-action flex justify-end gap-2">
+                                            <button
+                                                className="btn btn-error"
+                                                onClick={handleReject}
+                                            >
+                                                Reject
+                                            </button>
+                                            <button
+                                                className="btn btn-success"
+                                                onClick={handleApprove}
+                                            >
+                                                Approve
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                             </div>
-
-                            <div className="form-control mb-4">
-                                <label className="label">
-                                    <span className="label-text font-semibold">About</span>
-                                </label>
-                                <textarea
-                                    className="textarea textarea-bordered h-24"
-                                    value={selectedStudent.about || 'No information provided'}
-                                    readOnly
-                                />
-                            </div>
-
-                            {selectedStudent.resume_url && (
-                                <div className="form-control mb-6">
-                                    <label className="label">
-                                        <span className="label-text font-semibold">Resume</span>
-                                    </label>
-                                    <a
-                                        href={selectedStudent.resume_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="btn btn-outline"
-                                    >
-                                        View Resume
-                                    </a>
-                                </div>
-                            )}
-
-                            {selectedStudent.status === 'pending' && (
-                                <div className="modal-action flex justify-end gap-2">
-                                    <button
-                                        className="btn btn-error"
-                                        onClick={handleReject}
-                                    >
-                                        Reject
-                                    </button>
-                                    <button
-                                        className="btn btn-success"
-                                        onClick={handleApprove}
-                                    >
-                                        Approve
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

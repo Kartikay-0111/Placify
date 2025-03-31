@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import JobCard from '@/components/JobCard';
 import AppNavbar from '@/components/AppNavbar';
+import ApplicationStatus from '../../components/ApplicatonStatus';
 
 export default function StudentDashboard() {
   const { user } = useAuth();

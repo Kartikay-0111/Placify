@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import AppNavbar from '@/components/AppNavbar';
+import ApplicationStatus from '../../components/ApplicatonStatus';
+
 import { 
   Building2, 
   MapPin, 
@@ -20,7 +22,7 @@ export default function JobDetails() {
   const [applying, setApplying] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState(null);
   const [profile, setProfile] = useState(null);
-
+// console.log(user)
   useEffect(() => {
     const fetchJob = async () => {
       setLoading(true);
@@ -140,22 +142,16 @@ export default function JobDetails() {
           </div>
 
           <div className="divider"></div>
-          {user.role=='company' && 
+          {user.role === 'company' && 
           <div className="flex justify-center">
             <Link to={`/company/jobs/edit/${job.id}`} className="btn btn-primary w-full max-w-xs">
               Edit Job
             </Link>
           </div>}
 
-          {user.role=='student' && <div className="flex justify-center">
+          {user.role === 'student' && <div className="flex justify-center">
             {applicationStatus ? (
-              <div className={`badge ${
-                applicationStatus === 'pending' ? 'badge-secondary' : 
-                applicationStatus === 'accepted' ? 'badge-success' : 
-                'badge-error'
-              } p-4`}>
-                Application Status: {applicationStatus}
-              </div>
+              <ApplicationStatus status={applicationStatus} className="p-4" />
             ) : (
               user ? (
                 profile?.resume_url ? (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Link } from 'react-router-dom';
 import AppNavbar from '../../components/AppNavbar';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -234,14 +235,11 @@ export default function ManageApplications() {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <details className="collapse bg-base-200">
-                                                    <summary className="collapse-title text-sm font-medium px-2 py-1 min-h-0">
-                                                        View Notes
-                                                    </summary>
-                                                    <div className="collapse-content text-sm p-2">
-                                                        {application.company_notes || 'No notes added.'}
-                                                    </div>
-                                                </details>
+                                                <div className="collapse bg-base-200">
+                                                    <Link to='/company/interview' className="collapse-title text-sm font-medium px-2 py-1 min-h-0">
+                                                        Schedule Interview
+                                                    </Link>
+                                                </div>
                                             )}
                                         </td>
                                     </tr>
