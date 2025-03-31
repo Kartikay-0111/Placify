@@ -47,7 +47,7 @@ npm install
 - Create a new project in [Supabase](https://supabase.com/)
 - Copy your **API keys & Database URL**
 - You need to create tables in supabase.
-- The database schema is defined in [`tables.sql`](tables.sql).
+- The database schema is defined in [`tables.sql`](src/lib/tables.sql).
 
 ### **4️⃣ Add Environment Variables**
 Create a `.env` file in the root folder and add:
