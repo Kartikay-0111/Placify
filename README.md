@@ -69,9 +69,6 @@ npm run dev
 - **AI-based Job Recommendations**
 - **Export Student & Job Data**
 
-## 📜 License
-This project is licensed under the MIT License.
-
 ## 🤝 Contributing
 Feel free to raise issues or contribute to the project via pull requests!
 
